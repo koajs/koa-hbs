@@ -32,6 +32,8 @@ function Hbs(app, options) {
   if(!app) throw new Error("must provide koa app instance");
   this.app = app;
 
+  if(!options.viewPath) throw new Error("must specify view path");
+
   // Attach options
   var options = options || {};
   this.viewPath = options.viewPath;
@@ -69,7 +71,7 @@ Hbs.prototype.getRender = function () {
  * Attach Hbs methods to koa context
  * @param {Object} instance of koajs context
  */
- 
+
 Hbs.prototype.attachToKoa = function(koa) {
   koa.context.render = this.getRender();
 }

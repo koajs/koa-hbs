@@ -9,7 +9,7 @@
   },
   "homepage": "https://github.com/jwilm/koa-hbs/",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "make test"
   },
   "keywords": [
     "koa",
@@ -20,6 +20,11 @@
   "license": "MIT",
   "dependencies": {
     "handlebars": "1.2.x"
+  },
+  "devDependencies": {
+    "mocha": "1.16.x",
+    "koa": "0.1.x",
+    "supertest": "0.8.x"
   },
   "engines": {
     "node": ">= 0.11.9"
