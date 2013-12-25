@@ -14,10 +14,18 @@ var read = function (filename) {
 };
 
 /**
- * expose `Hbs`
+ * expose default instance of `Hbs`
  */
 
-exports = module.exports = Hbs;
+exports = module.exports = new Hbs();
+
+/**
+ * expose method to create additional instances of `Hbs`
+ */
+
+exports.create = function() {
+  return new Hbs();
+};
 
 
 /**
@@ -26,9 +34,15 @@ exports = module.exports = Hbs;
  * @api public
  */
 
-function Hbs(app, options) {
-  if(!(this instanceof Hbs)) return new Hbs(app,options);
+function Hbs() {
+  if(!(this instanceof Hbs)) return new Hbs();
+}
 
+/**
+ * Configure the instance.
+ */
+
+Hbs.prototype.configure = function (app, options) {
   if(!app) throw new Error("must provide koa app instance");
   this.app = app;
 
@@ -37,7 +51,7 @@ function Hbs(app, options) {
   // Attach options
   var options = options || {};
   this.viewPath = options.viewPath;
-  this.handlebars = options.handlebars || handlebars;
+  this.handlebars = options.handlebars || require('handlebars').create();
   this.templateOptions = options.templateOptions || {};
   this.extname = options.extname || '.hbs';
 
@@ -50,7 +64,9 @@ function Hbs(app, options) {
 
   // Create generators with reference to this instance of Hbs.
   this.attachToKoa(app);
-}
+
+  return this;
+};
 
 /**
  * Create generator for rendering templates

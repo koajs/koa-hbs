@@ -6,14 +6,14 @@ var request = require('supertest');
 describe('hbs', function() {
   it('should throw an error when viewPath is not set', function() {
     var app = koa();
-    assert.throws(function() { hbs(app, {}); });
+    assert.throws(function() { hbs.create.configure(app, {}); });
   });
 
   describe('render', function() {
 
     it('should put html in koa response body', function() {
       var app = koa();
-      hbs(app, {
+      h = hbs.create().configure(app, {
         viewPath: __dirname + '/assets'
       });
 
