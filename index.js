@@ -37,6 +37,11 @@ exports.create = function() {
 
 function Hbs() {
   if(!(this instanceof Hbs)) return new Hbs();
+
+  this.handlebars = require('handlebars').create();
+
+  this.Utils = this.handlebars.Utils;
+  this.SafeString = this.handlebars.SafeString;
 }
 
 /**
@@ -52,7 +57,7 @@ Hbs.prototype.configure = function (options) {
   // Attach options
   var options = options || {};
   this.viewPath = options.viewPath;
-  this.handlebars = options.handlebars || require('handlebars').create();
+  this.handlebars = options.handlebars || this.handlebars;
   this.templateOptions = options.templateOptions || {};
   this.extname = options.extname || '.hbs';
   this.partialsPath = options.partialsPath || '';
@@ -105,9 +110,9 @@ Hbs.prototype.registerHelper = function() {
  * Register partial with internal handlebars instance
  */
 
- Hbs.prototype.registerPartial = function() {
+Hbs.prototype.registerPartial = function() {
   this.handlebars.registerPartial.apply(this.handlebars, arguments);
- }
+}
 
 /**
  * Register directory of partials

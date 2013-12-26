@@ -1,7 +1,7 @@
 var hbs = require('../../index');
 var koa = require('koa');
 
-var create = function() {
+var create = function(opts) {
   var app = koa();
   var _hbs = hbs.create();
 
@@ -9,10 +9,7 @@ var create = function() {
     console.error(err.stack);
   });
 
-  app.use(_hbs.middleware({
-    viewPath: __dirname + '/assets',
-    partialsPath: __dirname + '/assets/partials'
-  }));
+  app.use(_hbs.middleware(opts));
 
   app.use(function*(next) {
     if(this.path == '/')
@@ -33,6 +30,20 @@ var create = function() {
     } else {
       yield next;
     }
+  });
+
+  app.use(function*(next) {
+    if(this.path == '/layout')
+      yield this.render('useDefaultLayout');
+    else
+      yield next;
+  });
+
+  app.use(function*(next) {
+    if(this.path == '/altLayout')
+      yield this.render('useAlternativeLayout');
+    else
+      yield next;
   });
 
   return app;
