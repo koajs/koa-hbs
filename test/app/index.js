@@ -3,14 +3,16 @@ var koa = require('koa');
 
 var create = function() {
   var app = koa();
-  var h = hbs.create().configure(app, {
-    viewPath: __dirname + '/assets',
-    partialsPath: __dirname + '/assets/partials'
-  });
+  var _hbs = hbs.create();
 
   app.on('error', function(err) {
     console.error(err.stack);
   });
+
+  app.use(_hbs.middleware({
+    viewPath: __dirname + '/assets',
+    partialsPath: __dirname + '/assets/partials'
+  }));
 
   app.use(function*(next) {
     if(this.path == '/')

@@ -1,6 +1,6 @@
 {
   "name": "koa-hbs",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Handlebars Templates via Generators for Koa",
   "main": "index.js",
   "repository": {
@@ -14,7 +14,9 @@
   "keywords": [
     "koa",
     "handlebars",
-    "template"
+    "template",
+    "view",
+    "render"
   ],
   "author": "Joe Wilm <jdwilm@gmail.com>",
   "license": "MIT",

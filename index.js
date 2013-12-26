@@ -41,11 +41,11 @@ function Hbs() {
 
 /**
  * Configure the instance.
+ *
+ * @api private
  */
 
-Hbs.prototype.configure = function (app, options) {
-  if(!app) throw new Error("must provide koa app instance");
-  this.app = app;
+Hbs.prototype.configure = function (options) {
 
   if(!options.viewPath) throw new Error("must specify view path");
 
@@ -63,9 +63,6 @@ Hbs.prototype.configure = function (app, options) {
   this.defaultLayout = options.defaultLayout || '';
   this.layoutsDir = options.layoutsDir || '';
 
-  // Create generators with reference to this instance of Hbs.
-  this.attachToKoa(app);
-
   // Register partials in options partialsPath(s)
   this.registerPartials();
 
@@ -73,27 +70,27 @@ Hbs.prototype.configure = function (app, options) {
 };
 
 /**
- * Create generator for rendering templates
+ * Middleware for koa
+ *
+ * @api public
  */
-
-Hbs.prototype.getRender = function () {
+Hbs.prototype.middleware = function(options) {
   var hbs = this;
-  return function *(templateName, args) {
+  this.configure(options);
+
+  var render = function *(templateName, args) {
     var templatePath = path.join(hbs.viewPath, templateName + hbs.extname);
+    // No caching yet
     var tplFile = yield read(templatePath);
     var template = hbs.handlebars.compile(tplFile.toString());
 
     this.body = template(args, hbs.templateOptions);
   };
-};
 
-/**
- * Attach Hbs methods to koa context
- * @param {Object} instance of koajs context
- */
-
-Hbs.prototype.attachToKoa = function(koa) {
-  koa.context.render = this.getRender();
+  return function *(next) {
+    this.render = render;
+    yield next;
+  };
 }
 
 /**

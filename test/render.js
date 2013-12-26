@@ -4,10 +4,9 @@ var assert = require('assert');
 var request = require('supertest');
 var testApp = require('./app');
 
-describe('when called incorrectly', function() {
+describe('without required options', function() {
   it('should throw an error when viewPath is not set', function() {
-    var app = koa();
-    assert.throws(function() { hbs.create.configure(app, {}); });
+    assert.throws(function() { hbs.create().middleware({}); });
   });
 });
 
@@ -15,7 +14,7 @@ describe('render', function() {
   var app;
   before(function(done) {
     app = testApp.create();
-    setTimeout(done, 200); // make sure partials are loaded
+    setTimeout(done, 200); // hack to make sure partials are loaded
   });
 
   it('should put html in koa response body', function(done) {
