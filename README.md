@@ -4,7 +4,9 @@ koa-hbs
 Handlebars Templates via Generators for [Koa](https://github.com/koajs/koa/)
 
 ## Foreward
-This is package offers minimum viability. There is no support for partials or layouts yet. You may render a self contained template. Handlebars helpers can be defined on your own instance of Handlebars which you pass to koa-hbs options.
+This is package offers minimum viability. Registering partials and synchronous
+helpers is supported, but asynchronous helpers and layouts are not. Layouts are
+next on the list.
 
 ## Usage
 koa-hbs is middleware. Configure the default instance by passing an options hash to #middleware, or create an independent instance using #create().
@@ -39,7 +41,7 @@ The plan for koa-hbs is to offer identical functionality as express-hbs (eventau
 - `extname`: Alter the default template extension (default: `.hbs`)
 - `partialsPath`: Use this directory for partials
 
-These options are **NOT** supported yet.
+These options are **NOT** supported (because we don't support layouts ... yet).
 
 - `contentHelperName`: Alter `contentFor` helper name
 - `blockHelperName`: Alter `block` helper name
