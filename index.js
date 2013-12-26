@@ -1,6 +1,7 @@
 var fs = require('fs');
-var handlebars = require('handlebars');
 var path = require('path');
+var co = require('co');
+var readdirp = require('readdirp');
 
 /**
  * file reader returning a thunk
@@ -9,7 +10,7 @@ var path = require('path');
 
 var read = function (filename) {
   return function(done) {
-    fs.readFile(filename, done);
+    fs.readFile(filename, {encoding: 'utf8'}, done);
   };
 };
 
@@ -54,16 +55,19 @@ Hbs.prototype.configure = function (app, options) {
   this.handlebars = options.handlebars || require('handlebars').create();
   this.templateOptions = options.templateOptions || {};
   this.extname = options.extname || '.hbs';
+  this.partialsPath = options.partialsPath || '';
 
   // Support for these options is planned, but not yet supported:
   this.contentHelperName = options.contentHelperName || 'contentFor';
   this.blockHelperName = options.blockHelperName || 'block';
-  this.partialsDir = options.partialsDir || '';
   this.defaultLayout = options.defaultLayout || '';
   this.layoutsDir = options.layoutsDir || '';
 
   // Create generators with reference to this instance of Hbs.
   this.attachToKoa(app);
+
+  // Register partials in options partialsPath(s)
+  this.registerPartials();
 
   return this;
 };
@@ -91,3 +95,66 @@ Hbs.prototype.getRender = function () {
 Hbs.prototype.attachToKoa = function(koa) {
   koa.context.render = this.getRender();
 }
+
+/**
+ * Register helper to internal handlebars instance
+ */
+
+Hbs.prototype.registerHelper = function() {
+  this.handlebars.registerHelper.apply(this.handlebars, arguments);
+}
+
+/**
+ * Register partial with internal handlebars instance
+ */
+
+ Hbs.prototype.registerPartial = function() {
+  this.handlebars.registerPartial.apply(this.handlebars, arguments);
+ }
+
+/**
+ * Register directory of partials
+ */
+
+Hbs.prototype.registerPartials = function(cb) {
+  var self = this, partials, dirpArray, files = [], names = [], partials,
+    rname = /^[a-zA-Z_-]+/, readdir;
+
+  if(this.partialsPath == '')
+    return;
+
+  if(!(this.partialsPath instanceof Array))
+    this.partialsPath = [this.partialsPath];
+
+  /* thunk creator for readdirp */
+  readdir = function(root) {
+    return function(done) {
+      readdirp({root: root, fileFilter: '*' + self.extname}, done);
+    };
+  };
+
+  /* Read in partials and register them */
+  co(function *() {
+    try {
+      readdirpResults = yield self.partialsPath.map(readdir);
+
+      // Generate list of files and template names
+      readdirpResults.forEach(function(result) {
+        result.files.forEach(function(file) {
+          files.push(file.fullPath);
+          names.push(rname.exec(file.path)[0]);
+        });
+      });
+
+      // Read all the partial from disk
+      partials = yield files.map(read);
+      for(var i=0; i!=partials.length; i++) {
+        self.registerPartial(names[i], partials[i]);
+      }
+
+    } catch(e) {
+      console.error('Error caught while registering partials');
+      console.error(e);
+    }
+  })();
+};
