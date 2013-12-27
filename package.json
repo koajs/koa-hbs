@@ -22,7 +22,6 @@
   "license": "MIT",
   "dependencies": {
     "handlebars": "1.2.x",
-    "co": "3.0.x",
     "readdirp": "0.3.x"
   },
   "devDependencies": {
