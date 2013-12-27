@@ -55,6 +55,8 @@ function Hbs() {
 
 Hbs.prototype.configure = function (options) {
 
+  var self = this;
+
   if(!options.viewPath) throw new Error("must specify view path");
 
   // Attach options
@@ -73,6 +75,23 @@ Hbs.prototype.configure = function (options) {
 
   // Cache templates and layouts
   this.cache = {};
+
+  this.blocks = {};
+
+  // block helper
+  this.registerHelper(this.blockHelperName, function(name, options) {
+    // instead of returning self.block(name), render the default content if no
+    // block is given
+    val = self.block(name);
+    if(val == '' && typeof options.fn === 'function') val = options.fn(this);
+
+    return val;
+  })
+
+  // contentFor helper
+  this.registerHelper(this.contentHelperName, function(name, options) {
+    return self.content(name, options, this);
+  })
 
   return this;
 };
@@ -252,3 +271,28 @@ Hbs.prototype.registerPartials = function () {
 
   });
 };
+
+/**
+ * The contentFor helper delegates to here to populate block content
+ */
+
+Hbs.prototype.content = function(name, options, context) {
+  // fetch block
+  var block = this.blocks[name] || (this.blocks[name] = []);
+
+  // render block and save for layout render
+  block.push(options.fn(context));
+}
+
+/**
+ * block helper delegates to this function to retreive content
+ */
+
+Hbs.prototype.block = function(name) {
+  // val = block.toString
+  var val = (this.blocks[name] || []).join('\n');
+
+  // clear the block
+  this.blocks[name] = [];
+  return val;
+}
