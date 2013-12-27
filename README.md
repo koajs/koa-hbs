@@ -1,7 +1,8 @@
 koa-hbs
 =======
 
-Handlebars Templates via Generators for [Koa](https://github.com/koajs/koa/)
+[Handlebars](http://handlebarsjs.com) Templates via Generators for
+[Koa](https://github.com/koajs/koa/)
 
 ## Forward
 Things that are supported:
@@ -9,11 +10,11 @@ Things that are supported:
 - Registering partials
 - Specify a directory or multiple directories of partials to register
 - Single default layout
+- Alternative layouts
 - Template caching (actually, this cannot be disabled presently)
 
 Things that will be, but are **not** yet supported:
 - Asynchronous helpers
-- Alternative layouts
 - Content blocks
 
 ## Usage
@@ -41,28 +42,9 @@ app.listen(3000);
 
 ```
 
-after a template has been rendered, the template function is cached.
-
-### Options
-The plan for koa-hbs is to offer identical functionality as express-hbs
-(eventaully). These options are supported _now_.
-
-- `viewPath`: [_required_] Full path from which to load templates
-  (`Array|String`)
-- `handlebars`: Pass your own instance of handlebars
-- `templateOptions`: Hash of
-  [options](http://handlebarsjs.com/execution.html#Options) to pass to
-  `template()`
-- `extname`: Alter the default template extension (default: `'.hbs'`)
-- `partialsPath`: Full path to partials directory (`Array|String`)
-- `defaultLayout`: Name of the default layout
-- `layoutsPath`: Full path to layouts directory (`String`)
-
-These options are **NOT** supported yet.
-
-- `contentHelperName`: Alter `contentFor` helper name
-- `blockHelperName`: Alter `block` helper name
-
+After a template has been rendered, the template function is cached. `#render#
+accepts two arguements - the template to render, and an object containing local
+variables to be inserted into the template.
 
 ### Registering Helpers
 Helpers are registered using the #registerHelper method. Here is an example
@@ -95,14 +77,50 @@ middleware as
 
 ### Layouts
 Passing `defaultLayout` with the a layout name will cause all templates to be
-inserted into the `{{{body}}}` expression of the layout. If `layoutsPath` is
-specified, koa-hbs will load your layout from that path; otherwise, the layout
-is assumed to be located in `viewPath`.
+inserted into the `{{{body}}}` expression of the layout. This might look like
+the following.
 
-**Note:** Only a single layout is currently supported. Alternative layout
-support will be added soon. To use an alternative layout, specify
-`{{!> layoutName}}` somewhere in your template. Again, this is **NOT** supported
-yet.
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{title}}</title>
+</head>
+<body>
+  {{{body}}}
+</body>
+</html>
+```
+
+In addition to, or alternatively, you may specify a layout to render a template
+into. Simply specify `{{!< layoutName }}` somewhere in your template. koa-hbs
+will load your layout from `layoutsPath` if defined, or from `viewPath`
+otherwise.
+
+At this time, only a single content block (`{{{body}}}`) is supported. Block and
+contentFor helpers are on the list of features to implement.
+
+### Options
+The plan for koa-hbs is to offer identical functionality as express-hbs
+(eventaully). These options are supported _now_.
+
+- `viewPath`: [_required_] Full path from which to load templates
+  (`Array|String`)
+- `handlebars`: Pass your own instance of handlebars
+- `templateOptions`: Hash of
+  [options](http://handlebarsjs.com/execution.html#Options) to pass to
+  `template()`
+- `extname`: Alter the default template extension (default: `'.hbs'`)
+- `partialsPath`: Full path to partials directory (`Array|String`)
+- `defaultLayout`: Name of the default layout
+- `layoutsPath`: Full path to layouts directory (`String`)
+
+These options are **NOT** supported yet.
+
+- `contentHelperName`: Alter `contentFor` helper name
+- `blockHelperName`: Alter `block` helper name
+
+
 
 ## Example
 You can run the included example via `npm install koa` and

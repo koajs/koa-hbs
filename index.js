@@ -3,6 +3,9 @@ var path = require('path');
 var co = require('co');
 var readdirp = require('readdirp');
 
+/* Capture the layout name; thanks express-hbs */
+var rLayoutPattern = /{{!<\s+([A-Za-z0-9\._\-\/]+)\s*}}/;
+
 /**
  * file reader returning a thunk
  * @param filename {String} Name of file to read
@@ -70,7 +73,6 @@ Hbs.prototype.configure = function (options) {
 
   // Cache templates and layouts
   this.cache = {};
-  this.layoutCache = {};
 
   return this;
 };
@@ -80,6 +82,7 @@ Hbs.prototype.configure = function (options) {
  *
  * @api public
  */
+
 Hbs.prototype.middleware = function(options) {
   this.configure(options);
 
@@ -100,28 +103,40 @@ Hbs.prototype.createRenderer = function() {
 
   return function *(tpl, locals) {
     var tplPath = path.join(hbs.viewPath, tpl + hbs.extname),
-      template,
-      file;
+      template, rawTemplate, layoutTemplate;
 
     locals = locals || {};
 
+    // Initialization... move these actions into another function to remove
+    // unnecessary checks
     if(!hbs.partialsRegistered)
       yield hbs.registerPartials();
 
     if(!hbs.layoutTemplate)
-      hbs.layoutTemplate = yield hbs.cacheDefaultLayout();
+      hbs.layoutTemplate = yield hbs.cacheLayout();
 
-    // Load Template
-    if(hbs.cache[tpl]) {
-      template = hbs.cache[tpl];
-    } else {
-      file = yield read(tplPath);
-      template = hbs.cache[tpl] = hbs.handlebars.compile(file);
+    // Load the template
+    if(!hbs.cache[tpl]) {
+      rawTemplate = yield read(tplPath);
+      hbs.cache[tpl] = {
+        template: hbs.handlebars.compile(rawTemplate)
+      }
+
+      // Load layout if specified
+      if(rLayoutPattern.test(rawTemplate)) {
+        var layout = rLayoutPattern.exec(rawTemplate)[1];
+        console.log(layout);
+        var rawLayout = yield hbs.loadLayoutFile(layout);
+        hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile(rawLayout);
+      }
     }
+
+    template = hbs.cache[tpl].template;
+    layoutTemplate = hbs.cache[tpl].layoutTemplate || hbs.layoutTemplate;
 
     // Run the compiled templates
     locals.body = template(locals, hbs.templateOptions);
-    this.body = hbs.layoutTemplate(locals, hbs.templateOptions);
+    this.body = layoutTemplate(locals, hbs.templateOptions);
   };
 }
 
@@ -140,24 +155,38 @@ Hbs.prototype.getLayoutPath = function(layout) {
  * Get a default layout. If none is provided, make a noop
  */
 
-Hbs.prototype.cacheDefaultLayout = function() {
+Hbs.prototype.cacheLayout = function(layout) {
   var hbs = this;
   return co(function* () {
-    if(!hbs.defaultLayout)
+    // Create a default layout to always use
+    if(!layout && !hbs.defaultLayout)
       return hbs.handlebars.compile("{{{body}}}");
+
+    // Compile the default layout if one not passed
+    if(!layout) layout = hbs.defaultLayout;
 
     var layoutTemplate;
     try {
-      var layoutFile = hbs.getLayoutPath(hbs.defaultLayout);
-      var layout = yield read(layoutFile);
-      layoutTemplate = hbs.handlebars.compile(layout);
+      var rawLayout = yield hbs.loadLayoutFile(layout);
+      layoutTemplate = hbs.handlebars.compile(rawLayout);
     } catch (err) {
       console.error(err.stack);
     }
 
     return layoutTemplate;
-
   });
+}
+
+/**
+ * Load a layout file
+ */
+
+Hbs.prototype.loadLayoutFile = function(layout) {
+  var hbs = this;
+  return function(done) {
+    var file = hbs.getLayoutPath(layout);
+    read(file)(done);
+  };
 }
 
 /**

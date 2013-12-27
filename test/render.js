@@ -45,7 +45,7 @@ describe('simple render', function() {
   });
 });
 
-describe('render with layout', function() {
+describe('when using layouts', function() {
   var app;
   before(function() {
     // Create app which specifies layouts
@@ -57,14 +57,13 @@ describe('render with layout', function() {
     });
   });
 
-  describe('with default layout', function() {
+  describe('with the default layout', function() {
     it('should insert rendered content', function(done) {
       request(app.listen())
         .get('/layout')
         .expect(200)
         .end(function(err, content) {
           if(err) return done(err);
-          console.log(content.text);
           assert.ok(/DEFAULT LAYOUT/.test(content.text));
           assert.ok(/DEFAULT CONTENT/.test(content.text));
           done();
