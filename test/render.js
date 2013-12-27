@@ -10,11 +10,13 @@ describe('without required options', function() {
   });
 });
 
-describe('render', function() {
+describe('simple render', function() {
   var app;
-  before(function(done) {
-    app = testApp.create();
-    setTimeout(done, 200); // hack to make sure partials are loaded
+  before(function() {
+    app = testApp.create({
+      viewPath: __dirname + '/app/assets',
+      partialsPath: __dirname + '/app/assets/partials'
+    });
   });
 
   it('should put html in koa response body', function(done) {
@@ -41,5 +43,46 @@ describe('render', function() {
         });
     });
   });
+});
+
+describe('when using layouts', function() {
+  var app;
+  before(function() {
+    // Create app which specifies layouts
+    app = testApp.create({
+      viewPath: __dirname + '/app/assets',
+      partialsPath: __dirname + '/app/assets/partials',
+      layoutsPath: __dirname + '/app/assets/layouts',
+      defaultLayout: 'default'
+    });
+  });
+
+  describe('with the default layout', function() {
+    it('should insert rendered content', function(done) {
+      request(app.listen())
+        .get('/layout')
+        .expect(200)
+        .end(function(err, content) {
+          if(err) return done(err);
+          assert.ok(/DEFAULT LAYOUT/.test(content.text));
+          assert.ok(/DEFAULT CONTENT/.test(content.text));
+          done();
+        });
+    });
+
+    it('should support alternative layouts', function(done) {
+      request(app.listen())
+        .get('/altLayout')
+        .expect(200)
+        .end(function(err, content) {
+          if(err) return done(err);
+          assert.ok(/ALTERNATIVE LAYOUT/.test(content.text));
+          assert.ok(/ALTERNATIVE CONTENT/.test(content.text));
+          done();
+        })
+    })
+  });
 
 });
+
+
