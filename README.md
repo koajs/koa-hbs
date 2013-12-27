@@ -14,10 +14,11 @@ Things that are supported:
 - Single default layout
 - Alternative layouts
 - Template caching (actually, this cannot currently be disabled)
+- Content blocks
 
 Things that will be, but are **not** yet supported:
 - Asynchronous helpers
-- Content blocks
+
 
 ## Usage
 koa-hbs is middleware. Configure the default instance by passing an options hash
@@ -100,8 +101,28 @@ into. Simply specify `{{!< layoutName }}` somewhere in your template. koa-hbs
 will load your layout from `layoutsPath` if defined, or from `viewPath`
 otherwise.
 
-At this time, only a single content block (`{{{body}}}`) is supported. Block and
-contentFor helpers are on the list of features to implement.
+At this time, only a single content block (`{{{body}}}`) is supported.
+
+### Block content
+Reserve areas in a layout by using the `block` helper like so.
+
+```html
+{{#block "sidebar"}}
+  <!-- default content for the sidebar block -->
+{{/block}}
+```
+
+Then in a template, use the `contentFor` helper to render content into the
+block.
+
+```html
+{{#contentFor "sidebar"}}
+  <aside>
+    <h2>{{sidebarTitleLocal}}</h2>
+    <p>{{sidebarContentLocal}}</p>
+  </aside>
+{{/contentFor}}
+```
 
 ### Options
 The plan for koa-hbs is to offer identical functionality as express-hbs
@@ -111,19 +132,14 @@ The plan for koa-hbs is to offer identical functionality as express-hbs
   (`Array|String`)
 - `handlebars`: Pass your own instance of handlebars
 - `templateOptions`: Hash of
-  [options](http://handlebarsjs.com/execution.html#Options) to pass to
-  `template()`
+  [handlebars options](http://handlebarsjs.com/execution.html#Options) to pass
+  to `template()`
 - `extname`: Alter the default template extension (default: `'.hbs'`)
 - `partialsPath`: Full path to partials directory (`Array|String`)
 - `defaultLayout`: Name of the default layout
 - `layoutsPath`: Full path to layouts directory (`String`)
-
-These options are **NOT** supported yet.
-
 - `contentHelperName`: Alter `contentFor` helper name
 - `blockHelperName`: Alter `block` helper name
-
-
 
 ## Example
 You can run the included example via `npm install koa` and

@@ -1,5 +1,6 @@
 var hbs = require('../../index');
 var koa = require('koa');
+var router = require('koa-router');
 
 var create = function(opts) {
   var app = koa();
@@ -10,41 +11,37 @@ var create = function(opts) {
   });
 
   app.use(_hbs.middleware(opts));
+  app.use(router(app));
 
-  app.use(function*(next) {
-    if(this.path == '/')
-      yield this.render('main', {title: 'test'});
-    else
-      yield next;
+  app.get('/', function*() {
+    yield this.render('main', {title: 'test'});
   });
 
-  app.use(function* (next) {
-    if(this.path == '/partials') {
-      yield this.render('mainWithPartials', {
-        title: 'test',
-        anchorList:[
-          {url: 'https://google.com', name: 'google'},
-          {url: 'https://github.com', name: 'github'}
-        ]
-      });
-    } else {
-      yield next;
-    }
+  app.get('/partials', function*() {
+    yield this.render('mainWithPartials', {
+      title: 'test',
+      anchorList:[
+        {url: 'https://google.com', name: 'google'},
+        {url: 'https://github.com', name: 'github'}
+      ]
+    });
   });
 
-  app.use(function*(next) {
-    if(this.path == '/layout')
-      yield this.render('useDefaultLayout');
-    else
-      yield next;
+  app.get('/layout', function *() {
+    yield this.render('useDefaultLayout');
   });
 
-  app.use(function*(next) {
-    if(this.path == '/altLayout')
-      yield this.render('useAlternativeLayout');
-    else
-      yield next;
+  app.get('/altLayout', function *() {
+    yield this.render('useAlternativeLayout');
   });
+
+  app.get('/block', function *() {
+    yield this.render('usesBlockLayout');
+  });
+
+  app.get('/blockNoReplace', function *() {
+    yield this.render('usesBlockLayoutNoBlock');
+  })
 
   return app;
 }
