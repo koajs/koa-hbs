@@ -125,7 +125,6 @@ Hbs.prototype.createRenderer = function() {
       // Load layout if specified
       if(rLayoutPattern.test(rawTemplate)) {
         var layout = rLayoutPattern.exec(rawTemplate)[1];
-        console.log(layout);
         var rawLayout = yield hbs.loadLayoutFile(layout);
         hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile(rawLayout);
       }
@@ -209,7 +208,7 @@ Hbs.prototype.registerPartial = function() {
  * Register directory of partials
  */
 
-Hbs.prototype.registerPartials = function (cb) {
+Hbs.prototype.registerPartials = function () {
   var self = this, partials, dirpArray, files = [], names = [], partials,
     rname = /^[a-zA-Z_-]+/, readdir;
 
@@ -251,6 +250,5 @@ Hbs.prototype.registerPartials = function (cb) {
       console.error(e);
     }
 
-    return cb && cb(null, self);
   });
 };
