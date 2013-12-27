@@ -4,6 +4,8 @@ koa-hbs
 [Handlebars](http://handlebarsjs.com) Templates via Generators for
 [Koa](https://github.com/koajs/koa/)
 
+[![Build Status][travis-badge]][repo-url]
+
 ## Forward
 Things that are supported:
 - Registering helpers
@@ -11,7 +13,7 @@ Things that are supported:
 - Specify a directory or multiple directories of partials to register
 - Single default layout
 - Alternative layouts
-- Template caching (actually, this cannot be disabled presently)
+- Template caching (actually, this cannot currently be disabled)
 
 Things that will be, but are **not** yet supported:
 - Asynchronous helpers
@@ -19,7 +21,7 @@ Things that will be, but are **not** yet supported:
 
 ## Usage
 koa-hbs is middleware. Configure the default instance by passing an options hash
-to #middleware, or create an independent instance using #create().
+to #middleware or on an independant from #create().
 
 ```javascript
 var koa = require('koa');
@@ -27,13 +29,13 @@ var hbs = require('koa-hbs');
 
 var app = koa();
 
-// koa-hbs is middleware. Use it before you want to render a view
+// koa-hbs is middleware. `use` it before you want to render a view
 app.use(hbs.middleware({
   viewPath: __dirname + '/views'
 }));
 
-// Render is attached to the koa context. Call this.render in your middleware
-// to attach your rendered html to the response body.
+// Render is attached to the koa context. Call `this.render` in your middleware
+// to attach rendered html to the koa response body.
 app.use(function *() {
   yield this.render('main', {title: 'koa-hbs'});
 })
@@ -44,7 +46,8 @@ app.listen(3000);
 
 After a template has been rendered, the template function is cached. `#render#
 accepts two arguements - the template to render, and an object containing local
-variables to be inserted into the template.
+variables to be inserted into the template. The result is assigned to Koa's
+`this.response.body`.
 
 ### Registering Helpers
 Helpers are registered using the #registerHelper method. Here is an example
@@ -129,3 +132,6 @@ You can run the included example via `npm install koa` and
 ## Credits
 Functionality and code were inspired/taken from
 [express-hbs](https://github.com/barc/express-hbs/).
+
+[travis-badge]: https://travis-ci.org/jwilm/koa-hbs.png?branch=master
+[repo-url]: https://travis-ci.org/jwilm/koa-hbs
