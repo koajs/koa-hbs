@@ -12,12 +12,11 @@ describe('without required options', function() {
 
 describe('simple render', function() {
   var app;
-  before(function(done) {
+  before(function() {
     app = testApp.create({
       viewPath: __dirname + '/app/assets',
       partialsPath: __dirname + '/app/assets/partials'
     });
-    setTimeout(done, 200); // hack to make sure partials are loaded
   });
 
   it('should put html in koa response body', function(done) {
@@ -48,7 +47,7 @@ describe('simple render', function() {
 
 describe('render with layout', function() {
   var app;
-  before(function(done) {
+  before(function() {
     // Create app which specifies layouts
     app = testApp.create({
       viewPath: __dirname + '/app/assets',
@@ -56,16 +55,16 @@ describe('render with layout', function() {
       layoutsPath: __dirname + '/app/assets/layouts',
       defaultLayout: 'default'
     });
-    setTimeout(done, 200); // hack to make sure partials are loaded
   });
 
   describe('with default layout', function() {
-    it('should insert template into default layout', function(done) {
+    it('should insert rendered content', function(done) {
       request(app.listen())
         .get('/layout')
         .expect(200)
         .end(function(err, content) {
           if(err) return done(err);
+          console.log(content.text);
           assert.ok(/DEFAULT LAYOUT/.test(content.text));
           assert.ok(/DEFAULT CONTENT/.test(content.text));
           done();

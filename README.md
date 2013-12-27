@@ -3,14 +3,22 @@ koa-hbs
 
 Handlebars Templates via Generators for [Koa](https://github.com/koajs/koa/)
 
-## Foreward
-This is package offers minimum viability. Registering partials and synchronous
-helpers is supported, but asynchronous helpers and layouts are not. There is no
-caching of templates. Every call to render reads the template from disk. Layouts
-and caching are next on the list.
+## Forward
+Things that are supported:
+- Registering helpers
+- Registering partials
+- Specify a directory or multiple directories of partials to register
+- Single default layout
+- Template caching (actually, this cannot be disabled presently)
+
+Things that will be, but are **not** yet supported:
+- Asynchronous helpers
+- Alternative layouts
+- Content blocks
 
 ## Usage
-koa-hbs is middleware. Configure the default instance by passing an options hash to #middleware, or create an independent instance using #create().
+koa-hbs is middleware. Configure the default instance by passing an options hash
+to #middleware, or create an independent instance using #create().
 
 ```javascript
 var koa = require('koa');
@@ -33,21 +41,28 @@ app.listen(3000);
 
 ```
 
+after a template has been rendered, the template function is cached.
+
 ### Options
-The plan for koa-hbs is to offer identical functionality as express-hbs (eventaully). These options are supported _now_.
+The plan for koa-hbs is to offer identical functionality as express-hbs
+(eventaully). These options are supported _now_.
 
-- `viewPath`: [_required_] Where to load templates from
+- `viewPath`: [_required_] Full path from which to load templates
+  (`Array|String`)
 - `handlebars`: Pass your own instance of handlebars
-- `templateOptions`: Options to pass to `template()`
-- `extname`: Alter the default template extension (default: `.hbs`)
-- `partialsPath`: Use this directory for partials
+- `templateOptions`: Hash of
+  [options](http://handlebarsjs.com/execution.html#Options) to pass to
+  `template()`
+- `extname`: Alter the default template extension (default: `'.hbs'`)
+- `partialsPath`: Full path to partials directory (`Array|String`)
+- `defaultLayout`: Name of the default layout
+- `layoutsPath`: Full path to layouts directory (`String`)
 
-These options are **NOT** supported (because we don't support layouts ... yet).
+These options are **NOT** supported yet.
 
 - `contentHelperName`: Alter `contentFor` helper name
 - `blockHelperName`: Alter `block` helper name
-- `defaultLayout`: Name of the default layout
-- `layoutsDir`: Load layouts from here
+
 
 ### Registering Helpers
 Helpers are registered using the #registerHelper method. Here is an example
@@ -78,8 +93,20 @@ pass the `partialsPath` option when generating the middleware. Say your views
 are in `./views`, and your partials are in `./views/partials`. Configuring the
 middleware as
 
+### Layouts
+Passing `defaultLayout` with the a layout name will cause all templates to be
+inserted into the `{{{body}}}` expression of the layout. If `layoutsPath` is
+specified, koa-hbs will load your layout from that path; otherwise, the layout
+is assumed to be located in `viewPath`.
+
+**Note:** Only a single layout is currently supported. Alternative layout
+support will be added soon. To use an alternative layout, specify
+`{{!> layoutName}}` somewhere in your template. Again, this is **NOT** supported
+yet.
+
 ## Example
-You can run the included example via `npm install koa` and `node --harmony app.js` from the example folder.
+You can run the included example via `npm install koa` and
+`node --harmony app.js` from the example folder.
 
 ## Credits
 Functionality and code were inspired/taken from

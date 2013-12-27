@@ -3,6 +3,6 @@ test:
 		--harmony-generators \
 		-R spec \
 		test/render \
-		--bail
+		test/unit
 
 .PHONY: test

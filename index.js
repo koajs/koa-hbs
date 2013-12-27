@@ -61,15 +61,16 @@ Hbs.prototype.configure = function (options) {
   this.templateOptions = options.templateOptions || {};
   this.extname = options.extname || '.hbs';
   this.partialsPath = options.partialsPath || '';
-
-  // Support for these options is planned, but not yet supported:
   this.contentHelperName = options.contentHelperName || 'contentFor';
   this.blockHelperName = options.blockHelperName || 'block';
   this.defaultLayout = options.defaultLayout || '';
-  this.layoutsDir = options.layoutsDir || '';
+  this.layoutsPath = options.layoutsPath || '';
 
-  // Register partials in options partialsPath(s)
-  this.registerPartials();
+  this.partialsRegistered = false;
+
+  // Cache templates and layouts
+  this.cache = {};
+  this.layoutCache = {};
 
   return this;
 };
@@ -80,22 +81,83 @@ Hbs.prototype.configure = function (options) {
  * @api public
  */
 Hbs.prototype.middleware = function(options) {
-  var hbs = this;
   this.configure(options);
 
-  var render = function *(templateName, args) {
-    var templatePath = path.join(hbs.viewPath, templateName + hbs.extname);
-    // No caching yet
-    var tplFile = yield read(templatePath);
-    var template = hbs.handlebars.compile(tplFile.toString());
-
-    this.body = template(args, hbs.templateOptions);
-  };
+  var render = this.createRenderer();
 
   return function *(next) {
     this.render = render;
     yield next;
   };
+}
+
+/**
+ * Create a render generator to be attached to koa context
+ */
+
+Hbs.prototype.createRenderer = function() {
+  var hbs = this;
+
+  return function *(tpl, locals) {
+    var tplPath = path.join(hbs.viewPath, tpl + hbs.extname),
+      template,
+      file;
+
+    locals = locals || {};
+
+    if(!hbs.partialsRegistered)
+      yield hbs.registerPartials();
+
+    if(!hbs.layoutTemplate)
+      hbs.layoutTemplate = yield hbs.cacheDefaultLayout();
+
+    // Load Template
+    if(hbs.cache[tpl]) {
+      template = hbs.cache[tpl];
+    } else {
+      file = yield read(tplPath);
+      template = hbs.cache[tpl] = hbs.handlebars.compile(file);
+    }
+
+    // Run the compiled templates
+    locals.body = template(locals, hbs.templateOptions);
+    this.body = hbs.layoutTemplate(locals, hbs.templateOptions);
+  };
+}
+
+/**
+ * Get layout path
+ */
+
+Hbs.prototype.getLayoutPath = function(layout) {
+  if(this.layoutsPath)
+    return path.join(this.layoutsPath, layout + this.extname);
+
+  return path.join(this.viewPath, layout + this.extname);
+}
+
+/**
+ * Get a default layout. If none is provided, make a noop
+ */
+
+Hbs.prototype.cacheDefaultLayout = function() {
+  var hbs = this;
+  return co(function* () {
+    if(!hbs.defaultLayout)
+      return hbs.handlebars.compile("{{{body}}}");
+
+    var layoutTemplate;
+    try {
+      var layoutFile = hbs.getLayoutPath(hbs.defaultLayout);
+      var layout = yield read(layoutFile);
+      layoutTemplate = hbs.handlebars.compile(layout);
+    } catch (err) {
+      console.error(err.stack);
+    }
+
+    return layoutTemplate;
+
+  });
 }
 
 /**
@@ -118,7 +180,7 @@ Hbs.prototype.registerPartial = function() {
  * Register directory of partials
  */
 
-Hbs.prototype.registerPartials = function(cb) {
+Hbs.prototype.registerPartials = function (cb) {
   var self = this, partials, dirpArray, files = [], names = [], partials,
     rname = /^[a-zA-Z_-]+/, readdir;
 
@@ -136,7 +198,7 @@ Hbs.prototype.registerPartials = function(cb) {
   };
 
   /* Read in partials and register them */
-  co(function *() {
+  return co(function *() {
     try {
       readdirpResults = yield self.partialsPath.map(readdir);
 
@@ -154,9 +216,12 @@ Hbs.prototype.registerPartials = function(cb) {
         self.registerPartial(names[i], partials[i]);
       }
 
+      self.partialsRegistered = true;
     } catch(e) {
       console.error('Error caught while registering partials');
       console.error(e);
     }
-  })();
+
+    return cb && cb(null, self);
+  });
 };
