@@ -22,14 +22,14 @@
   "license": "MIT",
   "dependencies": {
     "handlebars": "1.2.x",
-    "co": "3.0.x",
     "readdirp": "0.3.x"
   },
   "devDependencies": {
     "mocha": "1.16.x",
     "koa": "0.1.x",
     "supertest": "0.8.x",
-    "koa-router": "2.0.1"
+    "koa-router": "2.0.1",
+    "co": "3.0.x"
   },
   "engines": {
     "node": ">= 0.11.9"

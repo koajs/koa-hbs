@@ -1,6 +1,5 @@
 var fs = require('fs');
 var path = require('path');
-var co = require('co');
 var readdirp = require('readdirp');
 
 /* Capture the layout name; thanks express-hbs */
@@ -175,7 +174,7 @@ Hbs.prototype.getLayoutPath = function(layout) {
 
 Hbs.prototype.cacheLayout = function(layout) {
   var hbs = this;
-  return co(function* () {
+  return function* () {
     // Create a default layout to always use
     if(!layout && !hbs.defaultLayout)
       return hbs.handlebars.compile("{{{body}}}");
@@ -192,7 +191,7 @@ Hbs.prototype.cacheLayout = function(layout) {
     }
 
     return layoutTemplate;
-  });
+  };
 }
 
 /**
@@ -245,7 +244,7 @@ Hbs.prototype.registerPartials = function () {
   };
 
   /* Read in partials and register them */
-  return co(function *() {
+  return function *() {
     try {
       readdirpResults = yield self.partialsPath.map(readdir);
 
@@ -269,7 +268,7 @@ Hbs.prototype.registerPartials = function () {
       console.error(e);
     }
 
-  });
+  };
 };
 
 /**
