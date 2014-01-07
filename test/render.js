@@ -12,14 +12,12 @@ describe('without required options', function() {
 
 describe('rendering', function() {
   var app;
-  before(function() {
-    app = testApp.create({
-      viewPath: __dirname + '/app/assets',
-      partialsPath: __dirname + '/app/assets/partials'
-    });
-  });
 
-  it('should put html in koa response body', function(done) {
+  it('should render into the response body', function(done) {
+    app = testApp.create({
+      viewPath: __dirname + '/app/assets'
+    });
+
     request(app.listen())
       .get('/')
       .expect(200)
@@ -32,7 +30,11 @@ describe('rendering', function() {
   });
 
   describe('with partials', function() {
-    it('should render the partials', function(done) {
+    it('should render into the response body', function(done) {
+      app = testApp.create({
+        viewPath: __dirname + '/app/assets',
+        partialsPath: __dirname + '/app/assets/partials'
+      });
       request(app.listen())
         .get('/partials')
         .expect(200)

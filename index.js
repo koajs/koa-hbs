@@ -128,7 +128,7 @@ Hbs.prototype.createRenderer = function() {
 
     // Initialization... move these actions into another function to remove
     // unnecessary checks
-    if(!hbs.partialsRegistered)
+    if(!hbs.partialsRegistered && hbs.partialsPath !== '')
       yield hbs.registerPartials();
 
     if(!hbs.layoutTemplate)
@@ -232,7 +232,7 @@ Hbs.prototype.registerPartials = function () {
     rname = /^[a-zA-Z_-]+/, readdir;
 
   if(this.partialsPath == '')
-    return;
+    throw new Error('registerPartials requires partialsPath');
 
   if(!(this.partialsPath instanceof Array))
     this.partialsPath = [this.partialsPath];
