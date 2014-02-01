@@ -77,7 +77,16 @@ proxies, or just register your helpers directly via your Handlebars instance.
 The simple way to register partials is to stick them all in a directory, and
 pass the `partialsPath` option when generating the middleware. Say your views
 are in `./views`, and your partials are in `./views/partials`. Configuring the
-middleware as
+middleware via
+
+```
+app.use(hbs.middleware({
+  viewPath: __dirname + '/views',
+  partialsPath: __dirname + '/views/partials'
+}));
+```
+
+will cause them to be automatically registered. Alternatively, you may register partials one at a time by calling `hbs.registerPartial` which proxies to the cached handlebars `#registerPartial` method.
 
 ### Layouts
 Passing `defaultLayout` with the a layout name will cause all templates to be
