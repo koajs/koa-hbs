@@ -43,6 +43,10 @@ var create = function(opts) {
     yield this.render('usesBlockLayoutNoBlock');
   })
 
+  app.get('/empty', function *() {
+    yield this.render('blank');
+  })
+
   return app;
 }
 
