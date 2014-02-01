@@ -1,28 +1,15 @@
 koa-hbs
 =======
 
-[Handlebars](http://handlebarsjs.com) Templates via Generators for
+[Handlebars](http://handlebarsjs.com) Templates via for
 [Koa](https://github.com/koajs/koa/)
 
 [![Build Status][travis-badge]][repo-url]
 
-## Forward
-Things that are supported:
-- Registering helpers
-- Registering partials
-- Specify a directory or multiple directories of partials to register
-- Single default layout
-- Alternative layouts
-- Template caching (actually, this cannot currently be disabled)
-- Content blocks
-
-Things that will be, but are **not** yet supported:
-- Asynchronous helpers
-
-
 ## Usage
-koa-hbs is middleware. Configure the default instance by passing an options hash
-to #middleware or on an independant from #create().
+koa-hbs is middleware. We stash an instance of koa-hbs for you in the library
+so you don't have to manage it separately. Configure the default instance by
+passing an [options](#options) hash to #middleware. To render a template then, just `yield this.render('templateName');`. Here's a basic app demonstrating all that:
 
 ```javascript
 var koa = require('koa');
@@ -42,7 +29,6 @@ app.use(function *() {
 })
 
 app.listen(3000);
-
 ```
 
 After a template has been rendered, the template function is cached. `#render`
@@ -68,10 +54,9 @@ hbs.registerHelper('link', function(text, url) {
 });
 ```
 
-registerHelper, Utils, and SafeString all proxy to an internal Handlebars
+`registerHelper`, `Utils`, and `SafeString` all proxy to an internal Handlebars
 instance. If passing an alternative instance of Handlebars to the middleware
-configurator, make sure to do so before registering your helpers via the koa-hbs
-proxies, or just register your helpers directly via your Handlebars instance.
+configurator, make sure to do so before registering helpers via the koa-hbs proxy of the above functions, or just register your helpers directly via your Handlebars instance.
 
 ### Registering Partials
 The simple way to register partials is to stick them all in a directory, and
@@ -153,6 +138,16 @@ The plan for koa-hbs is to offer identical functionality as express-hbs
 ## Example
 You can run the included example via `npm install koa` and
 `node --harmony app.js` from the example folder.
+
+## Unsupported Features
+
+Here's a few things _koa-hbs_ does not plan to support unless someone can provide really compelling justification.
+
+### Async Helpers
+_koa-hbs_ does not support asynchronous helpers. No, really - just load your data before rendering a view. This helps on performance and separation of concerns in your app.
+
+### Disable template caching
+For performance reasons, this feature is not supported. The render pipeline is pretty lean right now because there isn't much branching logic. There is probably a way to do this without much overhead, but due to tools like Grunt which can just reload your app when a template changes, what's the point?
 
 ## Credits
 Functionality and code were inspired/taken from
