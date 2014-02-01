@@ -29,6 +29,23 @@ describe('rendering', function() {
       });
   });
 
+  describe('with an empty template', function() {
+    it('should render a blank page', function(done) {
+      app = testApp.create({
+        viewPath: __dirname + '/app/assets'
+      });
+
+      request(app.listen())
+        .get('/empty')
+        .expect(200)
+        .end(function(err, page) {
+          if(err) return done(err);
+          assert.deepEqual(page.text, '');
+          done();
+        });
+    });
+  });
+
   describe('with partials', function() {
     it('should render into the response body', function(done) {
       app = testApp.create({
