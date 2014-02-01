@@ -41,11 +41,11 @@ var create = function(opts) {
 
   app.get('/blockNoReplace', function *() {
     yield this.render('usesBlockLayoutNoBlock');
-  })
+  });
 
   app.get('/empty', function *() {
-    yield this.render('blank');
-  })
+    yield this.render('empty');
+  });
 
   return app;
 }

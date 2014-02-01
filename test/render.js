@@ -36,7 +36,7 @@ describe('rendering', function() {
       });
 
       request(app.listen())
-        .get('/blank')
+        .get('/empty')
         .expect(200)
         .end(function(err, page) {
           if(err) return done(err);
