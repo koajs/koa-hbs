@@ -22,7 +22,8 @@
   "license": "MIT",
   "dependencies": {
     "handlebars": "1.2.x",
-    "readdirp": "0.3.x"
+    "readdirp": "0.3.x",
+    "merge": "1.1.x"
   },
   "devDependencies": {
     "mocha": "1.16.x",

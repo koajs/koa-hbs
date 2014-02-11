@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var readdirp = require('readdirp');
+var merge = require('merge');
 
 /* Capture the layout name; thanks express-hbs */
 var rLayoutPattern = /{{!<\s+([A-Za-z0-9\._\-\/]+)\s*}}/;
@@ -10,9 +11,11 @@ var rLayoutPattern = /{{!<\s+([A-Za-z0-9\._\-\/]+)\s*}}/;
  * @param filename {String} Name of file to read
  */
 
-var read = function (filename) {
+var read = function(filename) {
   return function(done) {
-    fs.readFile(filename, {encoding: 'utf8'}, done);
+    fs.readFile(filename, {
+      encoding: 'utf8'
+    }, done);
   };
 };
 
@@ -38,7 +41,7 @@ exports.create = function() {
  */
 
 function Hbs() {
-  if(!(this instanceof Hbs)) return new Hbs();
+  if (!(this instanceof Hbs)) return new Hbs();
 
   this.handlebars = require('handlebars').create();
 
@@ -52,11 +55,11 @@ function Hbs() {
  * @api private
  */
 
-Hbs.prototype.configure = function (options) {
+Hbs.prototype.configure = function(options) {
 
   var self = this;
 
-  if(!options.viewPath) throw new Error("must specify view path");
+  if (!options.viewPath) throw new Error("must specify view path");
 
   // Attach options
   var options = options || {};
@@ -69,6 +72,7 @@ Hbs.prototype.configure = function (options) {
   this.blockHelperName = options.blockHelperName || 'block';
   this.defaultLayout = options.defaultLayout || '';
   this.layoutsPath = options.layoutsPath || '';
+  this.locales = options.locales || {};
 
   this.partialsRegistered = false;
 
@@ -82,7 +86,7 @@ Hbs.prototype.configure = function (options) {
     // instead of returning self.block(name), render the default content if no
     // block is given
     val = self.block(name);
-    if(val == '' && typeof options.fn === 'function') val = options.fn(this);
+    if (val == '' && typeof options.fn === 'function') val = options.fn(this);
 
     return val;
   })
@@ -106,7 +110,7 @@ Hbs.prototype.middleware = function(options) {
 
   var render = this.createRenderer();
 
-  return function *(next) {
+  return function * (next) {
     this.render = render;
     yield next;
   };
@@ -119,29 +123,29 @@ Hbs.prototype.middleware = function(options) {
 Hbs.prototype.createRenderer = function() {
   var hbs = this;
 
-  return function *(tpl, locals) {
+  return function * (tpl, locals) {
     var tplPath = path.join(hbs.viewPath, tpl + hbs.extname),
       template, rawTemplate, layoutTemplate;
 
-    locals = locals || {};
+    locals = merge(hbs.locals, locals);
 
     // Initialization... move these actions into another function to remove
     // unnecessary checks
-    if(!hbs.partialsRegistered && hbs.partialsPath !== '')
+    if (!hbs.partialsRegistered && hbs.partialsPath !== '')
       yield hbs.registerPartials();
 
-    if(!hbs.layoutTemplate)
+    if (!hbs.layoutTemplate)
       hbs.layoutTemplate = yield hbs.cacheLayout();
 
     // Load the template
-    if(!hbs.cache[tpl]) {
+    if (!hbs.cache[tpl]) {
       rawTemplate = yield read(tplPath);
       hbs.cache[tpl] = {
         template: hbs.handlebars.compile(rawTemplate)
       }
 
       // Load layout if specified
-      if(rLayoutPattern.test(rawTemplate)) {
+      if (rLayoutPattern.test(rawTemplate)) {
         var layout = rLayoutPattern.exec(rawTemplate)[1];
         var rawLayout = yield hbs.loadLayoutFile(layout);
         hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile(rawLayout);
@@ -162,7 +166,7 @@ Hbs.prototype.createRenderer = function() {
  */
 
 Hbs.prototype.getLayoutPath = function(layout) {
-  if(this.layoutsPath)
+  if (this.layoutsPath)
     return path.join(this.layoutsPath, layout + this.extname);
 
   return path.join(this.viewPath, layout + this.extname);
@@ -174,13 +178,13 @@ Hbs.prototype.getLayoutPath = function(layout) {
 
 Hbs.prototype.cacheLayout = function(layout) {
   var hbs = this;
-  return function* () {
+  return function * () {
     // Create a default layout to always use
-    if(!layout && !hbs.defaultLayout)
+    if (!layout && !hbs.defaultLayout)
       return hbs.handlebars.compile("{{{body}}}");
 
     // Compile the default layout if one not passed
-    if(!layout) layout = hbs.defaultLayout;
+    if (!layout) layout = hbs.defaultLayout;
 
     var layoutTemplate;
     try {
@@ -226,25 +230,32 @@ Hbs.prototype.registerPartial = function() {
  * Register directory of partials
  */
 
-Hbs.prototype.registerPartials = function () {
-  var self = this, partials, dirpArray, files = [], names = [], partials,
-    rname = /^[a-zA-Z_-]+/, readdir;
+Hbs.prototype.registerPartials = function() {
+  var self = this,
+    partials, dirpArray, files = [],
+    names = [],
+    partials,
+    rname = /^[a-zA-Z_-]+/,
+    readdir;
 
-  if(this.partialsPath == '')
+  if (this.partialsPath == '')
     throw new Error('registerPartials requires partialsPath');
 
-  if(!(this.partialsPath instanceof Array))
+  if (!(this.partialsPath instanceof Array))
     this.partialsPath = [this.partialsPath];
 
   /* thunk creator for readdirp */
   readdir = function(root) {
     return function(done) {
-      readdirp({root: root, fileFilter: '*' + self.extname}, done);
+      readdirp({
+        root: root,
+        fileFilter: '*' + self.extname
+      }, done);
     };
   };
 
   /* Read in partials and register them */
-  return function *() {
+  return function * () {
     try {
       readdirpResults = yield self.partialsPath.map(readdir);
 
@@ -258,12 +269,12 @@ Hbs.prototype.registerPartials = function () {
 
       // Read all the partial from disk
       partials = yield files.map(read);
-      for(var i=0; i!=partials.length; i++) {
+      for (var i = 0; i != partials.length; i++) {
         self.registerPartial(names[i], partials[i]);
       }
 
       self.partialsRegistered = true;
-    } catch(e) {
+    } catch (e) {
       console.error('Error caught while registering partials');
       console.error(e);
     }
