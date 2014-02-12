@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var readdirp = require('readdirp');
+var merge = require('merge');
 
 /* Capture the layout name; thanks express-hbs */
 var rLayoutPattern = /{{!<\s+([A-Za-z0-9\._\-\/]+)\s*}}/;
@@ -69,6 +70,7 @@ Hbs.prototype.configure = function (options) {
   this.blockHelperName = options.blockHelperName || 'block';
   this.defaultLayout = options.defaultLayout || '';
   this.layoutsPath = options.layoutsPath || '';
+  this.locals = options.locals || {};
 
   this.partialsRegistered = false;
 
@@ -123,7 +125,7 @@ Hbs.prototype.createRenderer = function() {
     var tplPath = path.join(hbs.viewPath, tpl + hbs.extname),
       template, rawTemplate, layoutTemplate;
 
-    locals = locals || {};
+    locals = merge( hbs.locals, locals || {} );
 
     // Initialization... move these actions into another function to remove
     // unnecessary checks

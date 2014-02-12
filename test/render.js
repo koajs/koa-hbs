@@ -127,4 +127,40 @@ describe('rendering', function() {
 
   });
 
+  describe('when using locals', function() {
+    var app;
+    before(function() {
+      // Create app which specifies layouts
+      app = testApp.create({
+        viewPath: __dirname + '/app/assets',
+        partialsPath: __dirname + '/app/assets/partials',
+        layoutsPath: __dirname + '/app/assets/layouts',
+        locals: {
+          title: 'Foo'
+        }
+      });
+    });
+
+
+    it( 'should render "Foo"', function (done) {
+      request(app.listen())
+          .get('/locals')
+          .expect(200)
+          .end(function(err, content) {
+            console.log( content.text );
+            assert.ok(/Foo/.test(content.text));
+            done();
+          });
+    } );
+
+    it( 'should render "Bar"', function (done) {
+      request(app.listen())
+          .get('/localsOverride')
+          .expect(200)
+          .end(function(err, content) {
+            assert.ok(/Bar/.test(content.text));
+            done();
+          });
+    } );
+  } );
 });

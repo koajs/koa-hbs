@@ -47,6 +47,15 @@ var create = function(opts) {
     yield this.render('empty');
   });
 
+  app.get('/locals', function *() {
+    yield this.render('locals');
+  });
+  app.get('/localsOverride', function *() {
+    yield this.render('locals', {
+      title: 'Bar'
+    });
+  });
+
   return app;
 }
 
