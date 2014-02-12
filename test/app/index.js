@@ -57,6 +57,6 @@ var create = function(opts) {
   });
 
   return app;
-}
+};
 
 exports.create = create;
