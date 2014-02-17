@@ -26,7 +26,10 @@ var create = function(opts) {
       ]
     });
   });
-
+  
+  app.get('/nestedPartials', function*() {
+    yield this.render('nestedPartials' );
+  });
   app.get('/layout', function *() {
     yield this.render('useDefaultLayout');
   });
