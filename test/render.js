@@ -61,6 +61,16 @@ describe('rendering', function() {
           done();
         });
     });
+
+  it('should work also for nested partials', function (done) {
+    request(app.listen())
+      .get('/nestedPartials')
+      .expect(200)
+      .end(function (err, content) {
+        assert.ok(/NESTED/.test(content.text));
+        done();
+      });
+    });
   });
 
   describe('when using layouts', function () {

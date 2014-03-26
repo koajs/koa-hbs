@@ -22,7 +22,7 @@
   "license": "MIT",
   "dependencies": {
     "handlebars": "1.2.x",
-    "readdirp": "0.3.x",
+    "glob": "3.2.x",
     "merge": "1.1.x"
   },
   "devDependencies": {

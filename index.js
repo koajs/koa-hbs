@@ -1,6 +1,6 @@
 var fs = require('fs');
 var path = require('path');
-var readdirp = require('readdirp');
+var glob = require('glob');
 var merge = require('merge');
 
 /* Capture the layout name; thanks express-hbs */
@@ -229,8 +229,7 @@ Hbs.prototype.registerPartial = function() {
  */
 
 Hbs.prototype.registerPartials = function () {
-  var self = this, partials, dirpArray, files = [], names = [], partials,
-    rname = /^[a-zA-Z_-]+/, readdir;
+  var self = this;
 
   if(this.partialsPath == '')
     throw new Error('registerPartials requires partialsPath');
@@ -239,22 +238,26 @@ Hbs.prototype.registerPartials = function () {
     this.partialsPath = [this.partialsPath];
 
   /* thunk creator for readdirp */
-  readdir = function(root) {
+  var readdir = function(root) {
     return function(done) {
-      readdirp({root: root, fileFilter: '*' + self.extname}, done);
+      glob("**/*"+self.extname, {
+        cwd: root,
+      }, done);
     };
   };
 
   /* Read in partials and register them */
   return function *() {
     try {
-      readdirpResults = yield self.partialsPath.map(readdir);
+      var resultList = yield self.partialsPath.map( readdir );
+      var files = [];
+      var names = [];
 
       // Generate list of files and template names
-      readdirpResults.forEach(function(result) {
-        result.files.forEach(function(file) {
-          files.push(file.fullPath);
-          names.push(rname.exec(file.path)[0]);
+      resultList.forEach(function(result,i) {
+        result.forEach(function(file) {
+          files.push(path.join(self.partialsPath[i], file));
+          names.push(file.slice(0,-1*self.extname.length));
         });
       });
 
