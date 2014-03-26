@@ -1,6 +1,6 @@
 {
   "name": "koa-hbs",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Handlebars Templates via Generators for Koa",
   "main": "index.js",
   "repository": {
