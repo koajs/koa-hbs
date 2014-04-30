@@ -21,16 +21,16 @@
   "author": "Joe Wilm <jdwilm@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "handlebars": "1.2.x",
-    "glob": "3.2.x",
-    "merge": "1.1.x"
+    "handlebars": "^1.2.1",
+    "glob": "^3.2.9",
+    "lodash": "^2.4.1"
   },
   "devDependencies": {
-    "mocha": "1.16.x",
-    "koa": "0.1.x",
-    "supertest": "0.8.x",
-    "koa-router": "2.0.1",
-    "co": "3.0.x"
+    "mocha": "^1.18.2",
+    "koa": "^0.5.5",
+    "supertest": "^0.11.0",
+    "koa-router": "^3.1.3",
+    "co": "^3.0.5"
   },
   "engines": {
     "node": ">= 0.11.9"
