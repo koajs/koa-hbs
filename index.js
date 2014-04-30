@@ -1,7 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var glob = require('glob');
-var _ = require('lodash');
+var merge = require('merge');
 
 /* Capture the layout name; thanks express-hbs */
 var rLayoutPattern = /{{!<\s+([A-Za-z0-9\._\-\/]+)\s*}}/;
@@ -125,7 +125,7 @@ Hbs.prototype.createRenderer = function() {
     var tplPath = path.join(hbs.viewPath, tpl + hbs.extname),
       template, rawTemplate, layoutTemplate;
 
-    locals = _.merge(_.cloneDeep(hbs.locals), locals || {});
+    locals = merge(true, hbs.locals, locals || {});
 
     // Initialization... move these actions into another function to remove
     // unnecessary checks
