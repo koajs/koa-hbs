@@ -173,3 +173,50 @@ describe('rendering', function() {
     });
   });
 });
+
+describe('var conflict', function () {
+  var app = koa();
+  app.use(hbs.middleware({
+    viewPath: __dirname + '/app/assets'
+  }));
+  app.use(function * () {
+    if (this.url === '/first') {
+      yield this.render('locals', {
+        title: 'hbs'
+      });
+      return;
+    }
+    if (this.url === '/second') {
+      yield this.render('locals', {
+        name: 'hbs'
+      });
+      return;
+    }
+  });
+
+  before(function (done) {
+    app.listen(3000, function(){
+      done();
+    });
+  });
+
+  it('should render title', function (done) {
+    request('http://localhost:3000')
+      .get('/first')
+      .expect(200)
+      .end(function (err, content) {
+        assert.equal(content.text, '<h1>hbs</h1>');
+        done();
+      });
+  });
+
+  it('should not have title', function (done) {
+    request('http://localhost:3000')
+      .get('/second')
+      .expect(200)
+      .end(function (err, content) {
+        assert.equal(content.text, '<h1></h1>');
+        done();
+      });
+  });
+});
