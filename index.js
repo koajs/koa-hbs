@@ -1,7 +1,36 @@
 var fs = require('fs');
 var path = require('path');
 var glob = require('glob');
-var merge = require('merge');
+
+/**
+ * Shallow copy two objects into a new object
+ *
+ * Objects are merged from left to right. Thus, properties in objects further
+ * to the right are preferred over those on the left.
+ *
+ * @param {object} obj1
+ * @param {object} obj2
+ * @returns {object}
+ * @api private
+ */
+
+var merge = function (obj1, obj2) {
+  var c = {};
+  var keys = Object.keys(obj2);
+  for(var i=0; i!==keys.length; i++) {
+    c[keys[i]] = obj2[keys[i]];
+  }
+
+  keys = Object.keys(obj1);
+  for(i=0; i!==keys.length; i++) {
+    if (!c.hasOwnProperty(keys[i])) {
+      c[keys[i]] = obj1[keys[i]];
+    }
+  }
+
+  return c;
+};
+
 
 /* Capture the layout name; thanks express-hbs */
 var rLayoutPattern = /{{!<\s+([A-Za-z0-9\._\-\/]+)\s*}}/;
@@ -125,7 +154,7 @@ Hbs.prototype.createRenderer = function() {
     var tplPath = path.join(hbs.viewPath, tpl + hbs.extname),
       template, rawTemplate, layoutTemplate;
 
-    locals = merge(true, hbs.locals, locals || {});
+    locals = merge(hbs.locals, locals || {});
 
     // Initialization... move these actions into another function to remove
     // unnecessary checks
