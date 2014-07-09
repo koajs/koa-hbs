@@ -194,14 +194,13 @@ describe('var conflict', function () {
     }
   });
 
-  before(function (done) {
-    app.listen(3000, function(){
-      done();
-    });
+  var server;
+  before(function () {
+    server = app.listen();
   });
 
   it('should render title', function (done) {
-    request('http://localhost:3000')
+    request(server)
       .get('/first')
       .expect(200)
       .end(function (err, content) {
@@ -211,7 +210,7 @@ describe('var conflict', function () {
   });
 
   it('should not have title', function (done) {
-    request('http://localhost:3000')
+    request(server)
       .get('/second')
       .expect(200)
       .end(function (err, content) {
