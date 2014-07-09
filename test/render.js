@@ -151,6 +151,18 @@ describe('rendering', function() {
       });
     });
 
+    it('should not overflow the call stack when recursive', function (done) {
+      request(app.listen())
+        .get('/localsRecursive')
+        .expect(200)
+        .end(function (err, content) {
+          if(err) {
+            return done(err);
+          }
+
+          done();
+        });
+    });
 
     it('should render "Foo"', function (done) {
       request(app.listen())
