@@ -151,6 +151,18 @@ describe('rendering', function() {
       });
     });
 
+    it('should not overflow the call stack when recursive', function (done) {
+      request(app.listen())
+        .get('/localsRecursive')
+        .expect(200)
+        .end(function (err, content) {
+          if(err) {
+            return done(err);
+          }
+
+          done();
+        });
+    });
 
     it('should render "Foo"', function (done) {
       request(app.listen())
@@ -194,14 +206,13 @@ describe('var conflict', function () {
     }
   });
 
-  before(function (done) {
-    app.listen(3000, function(){
-      done();
-    });
+  var server;
+  before(function () {
+    server = app.listen();
   });
 
   it('should render title', function (done) {
-    request('http://localhost:3000')
+    request(server)
       .get('/first')
       .expect(200)
       .end(function (err, content) {
@@ -211,7 +222,7 @@ describe('var conflict', function () {
   });
 
   it('should not have title', function (done) {
-    request('http://localhost:3000')
+    request(server)
       .get('/second')
       .expect(200)
       .end(function (err, content) {

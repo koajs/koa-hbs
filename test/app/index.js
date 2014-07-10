@@ -59,6 +59,12 @@ var create = function(opts) {
     });
   });
 
+  app.get('/localsRecursive', function *() {
+    var obj = {};
+    obj.title = 'Bar';
+    obj.recursive = obj;
+    yield this.render('locals', obj);
+  });
   return app;
 };
 
