@@ -139,7 +139,7 @@ Hbs.prototype.middleware = function(options) {
 
   return function *(next) {
     this.render = render;
-    yield next;
+    yield* next;
   };
 }
 
