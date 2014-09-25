@@ -109,6 +109,18 @@ describe('rendering', function() {
             done();
           });
       });
+      
+      it('should support layout given in locals', function (done) {
+        request(app.listen())
+          .get('/localLayout')
+          .expect(200)
+          .end(function(err, content) {
+            if(err) return done(err);
+            assert.ok(/ALTERNATIVE LAYOUT/.test(content.text));
+            assert.ok(/LOCAL LAYOUT CONTENT/.test(content.text));
+            done();
+          })
+      })
     });
 
     describe('with block content', function() {

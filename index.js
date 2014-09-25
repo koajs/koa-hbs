@@ -152,9 +152,10 @@ Hbs.prototype.createRenderer = function() {
 
   return function *(tpl, locals) {
     var tplPath = path.join(hbs.viewPath, tpl + hbs.extname),
-      template, rawTemplate, layoutTemplate;
+      template, rawTemplate, layoutTemplate, rawLayout, layout;
 
     locals = merge(hbs.locals, locals || {});
+    layout = locals.layout;
 
     // Initialization... move these actions into another function to remove
     // unnecessary checks
@@ -170,11 +171,13 @@ Hbs.prototype.createRenderer = function() {
       hbs.cache[tpl] = {
         template: hbs.handlebars.compile(rawTemplate)
       }
-
       // Load layout if specified
       if(rLayoutPattern.test(rawTemplate)) {
-        var layout = rLayoutPattern.exec(rawTemplate)[1];
-        var rawLayout = yield hbs.loadLayoutFile(layout);
+        layout = rLayoutPattern.exec(rawTemplate)[1];
+      }
+      
+      if(layout) {
+        rawLayout = yield hbs.loadLayoutFile(layout);
         hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile(rawLayout);
       }
     }
