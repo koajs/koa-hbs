@@ -28,17 +28,5 @@ describe('unit tests', function() {
         viewPath: __dirname + '/app/assets'
       });
     });
-
-    it('should throw an error when partialsPath is not set', function(done) {
-      co(function*() {
-        try {
-          yield hbs.registerPartials();
-          done(new Error('did not throw error'));
-        } catch (e) {
-          assert.ok(/partialsPath/.test(e.message));
-          done();
-        }
-      })();
-    });
   });
 });

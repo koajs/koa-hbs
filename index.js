@@ -68,7 +68,7 @@ exports.create = function() {
  */
 
 function Hbs() {
-  if(!(this instanceof Hbs)) return new Hbs();
+  if(!(this instanceof Hbs)) { return new Hbs(); }
 
   this.handlebars = require('handlebars').create();
 
@@ -86,15 +86,15 @@ Hbs.prototype.configure = function (options) {
 
   var self = this;
 
-  if(!options.viewPath) throw new Error("must specify view path");
+  if(!options.viewPath) { throw new Error('must specify view path'); }
 
   // Attach options
-  var options = options || {};
+  options = options || {};
   this.viewPath = options.viewPath;
   this.handlebars = options.handlebars || this.handlebars;
   this.templateOptions = options.templateOptions || {};
   this.extname = options.extname || '.hbs';
-  this.partialsPath = options.partialsPath || '';
+  this.partialsPath = options.partialsPath || [];
   this.contentHelperName = options.contentHelperName || 'contentFor';
   this.blockHelperName = options.blockHelperName || 'block';
   this.defaultLayout = options.defaultLayout || '';
@@ -113,15 +113,17 @@ Hbs.prototype.configure = function (options) {
     // instead of returning self.block(name), render the default content if no
     // block is given
     val = self.block(name);
-    if(val == '' && typeof options.fn === 'function') val = options.fn(this);
+    if(val === '' && typeof options.fn === 'function') {
+      val = options.fn(this);
+    }
 
     return val;
-  })
+  });
 
   // contentFor helper
   this.registerHelper(this.contentHelperName, function(name, options) {
     return self.content(name, options, this);
-  })
+  });
 
   return this;
 };
@@ -141,7 +143,7 @@ Hbs.prototype.middleware = function(options) {
     this.render = render;
     yield* next;
   };
-}
+};
 
 /**
  * Create a render generator to be attached to koa context
@@ -158,18 +160,18 @@ Hbs.prototype.createRenderer = function() {
 
     // Initialization... move these actions into another function to remove
     // unnecessary checks
-    if(!hbs.partialsRegistered && hbs.partialsPath !== '')
+    if(!hbs.partialsRegistered && hbs.partialsPath !== '') {
       yield hbs.registerPartials();
+    }
 
-    if(!hbs.layoutTemplate)
-      hbs.layoutTemplate = yield hbs.cacheLayout();
+    if(!hbs.layoutTemplate) { hbs.layoutTemplate = yield hbs.cacheLayout(); }
 
     // Load the template
     if(!hbs.cache[tpl]) {
       rawTemplate = yield read(tplPath);
       hbs.cache[tpl] = {
         template: hbs.handlebars.compile(rawTemplate)
-      }
+      };
 
       // Load layout if specified
       if(rLayoutPattern.test(rawTemplate)) {
@@ -186,18 +188,19 @@ Hbs.prototype.createRenderer = function() {
     locals.body = template(locals, hbs.templateOptions);
     this.body = layoutTemplate(locals, hbs.templateOptions);
   };
-}
+};
 
 /**
  * Get layout path
  */
 
 Hbs.prototype.getLayoutPath = function(layout) {
-  if(this.layoutsPath)
+  if(this.layoutsPath) {
     return path.join(this.layoutsPath, layout + this.extname);
+  }
 
   return path.join(this.viewPath, layout + this.extname);
-}
+};
 
 /**
  * Get a default layout. If none is provided, make a noop
@@ -207,11 +210,12 @@ Hbs.prototype.cacheLayout = function(layout) {
   var hbs = this;
   return function* () {
     // Create a default layout to always use
-    if(!layout && !hbs.defaultLayout)
-      return hbs.handlebars.compile("{{{body}}}");
+    if(!layout && !hbs.defaultLayout) {
+      return hbs.handlebars.compile('{{{body}}}');
+    }
 
     // Compile the default layout if one not passed
-    if(!layout) layout = hbs.defaultLayout;
+    if(!layout) { layout = hbs.defaultLayout; }
 
     var layoutTemplate;
     try {
@@ -223,7 +227,7 @@ Hbs.prototype.cacheLayout = function(layout) {
 
     return layoutTemplate;
   };
-}
+};
 
 /**
  * Load a layout file
@@ -235,7 +239,7 @@ Hbs.prototype.loadLayoutFile = function(layout) {
     var file = hbs.getLayoutPath(layout);
     read(file)(done);
   };
-}
+};
 
 /**
  * Register helper to internal handlebars instance
@@ -243,7 +247,7 @@ Hbs.prototype.loadLayoutFile = function(layout) {
 
 Hbs.prototype.registerHelper = function() {
   this.handlebars.registerHelper.apply(this.handlebars, arguments);
-}
+};
 
 /**
  * Register partial with internal handlebars instance
@@ -251,7 +255,7 @@ Hbs.prototype.registerHelper = function() {
 
 Hbs.prototype.registerPartial = function() {
   this.handlebars.registerPartial.apply(this.handlebars, arguments);
-}
+};
 
 /**
  * Register directory of partials
@@ -260,16 +264,14 @@ Hbs.prototype.registerPartial = function() {
 Hbs.prototype.registerPartials = function () {
   var self = this;
 
-  if(this.partialsPath == '')
-    throw new Error('registerPartials requires partialsPath');
-
-  if(!(this.partialsPath instanceof Array))
+  if(!Array.isArray(this.partialsPath)) {
     this.partialsPath = [this.partialsPath];
+  }
 
   /* thunk creator for readdirp */
   var readdir = function(root) {
     return function(done) {
-      glob("**/*"+self.extname, {
+      glob('**/*' + self.extname, {
         cwd: root,
       }, done);
     };
@@ -282,6 +284,8 @@ Hbs.prototype.registerPartials = function () {
       var files = [];
       var names = [];
 
+      if (!resultList.length) { return; }
+
       // Generate list of files and template names
       resultList.forEach(function(result,i) {
         result.forEach(function(file) {
@@ -292,7 +296,7 @@ Hbs.prototype.registerPartials = function () {
 
       // Read all the partial from disk
       partials = yield files.map(read);
-      for(var i=0; i!=partials.length; i++) {
+      for(var i=0; i!==partials.length; i++) {
         self.registerPartial(names[i], partials[i]);
       }
 
@@ -315,7 +319,7 @@ Hbs.prototype.content = function(name, options, context) {
 
   // render block and save for layout render
   block.push(options.fn(context));
-}
+};
 
 /**
  * block helper delegates to this function to retreive content
@@ -328,4 +332,4 @@ Hbs.prototype.block = function(name) {
   // clear the block
   this.blocks[name] = [];
   return val;
-}
+};
