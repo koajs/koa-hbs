@@ -37,6 +37,10 @@ var create = function(opts) {
   app.get('/altLayout', function *() {
     yield this.render('useAlternativeLayout');
   });
+  
+  app.get('/localLayout', function *() {
+    yield this.render('useLayoutInLocals', {layout: 'alternative'});
+  });
 
   app.get('/block', function *() {
     yield this.render('usesBlockLayout');
@@ -58,7 +62,7 @@ var create = function(opts) {
       title: 'Bar'
     });
   });
-
+  
   app.get('/localsRecursive', function *() {
     var obj = {};
     obj.title = 'Bar';
