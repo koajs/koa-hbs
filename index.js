@@ -184,6 +184,14 @@ Hbs.prototype.createRenderer = function() {
     template = hbs.cache[tpl].template;
     layoutTemplate = hbs.cache[tpl].layoutTemplate || hbs.layoutTemplate;
 
+    // Add the current koa context to templateOptions.data to provide access
+    // to the request within helpers.
+    if (!hbs.templateOptions.data) {
+      hbs.templateOptions.data = {};
+    }
+
+    hbs.templateOptions.data = merge(hbs.templateOptions.data, { koa: this });
+
     // Run the compiled templates
     locals.body = template(locals, hbs.templateOptions);
     this.body = layoutTemplate(locals, hbs.templateOptions);
