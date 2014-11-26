@@ -135,6 +135,25 @@ The plan for koa-hbs is to offer identical functionality as express-hbs
 - `contentHelperName`: Alter `contentFor` helper name
 - `blockHelperName`: Alter `block` helper name
 
+### Locals
+
+Application local variables (```[this.state](https://github.com/koajs/koa/blob/master/docs/api/context.md#ctxstate)```) are provided to all templates rendered within the application.
+
+```javascript
+app.use(function *() {
+  this.state.title = 'My App';
+  this.state.email = 'me@myapp.com';
+});
+```
+
+The state object is a JavaScript Object. The properties added to it will be exposed as local variables within your views.
+
+```
+<title>{{title}}</title>
+
+<p>Contact : {{email}}</p>
+```
+
 ## Example
 You can run the included example via `npm install koa` and
 `node --harmony app.js` from the example folder.
