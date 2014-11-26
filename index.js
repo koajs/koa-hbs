@@ -156,7 +156,8 @@ Hbs.prototype.createRenderer = function() {
     var tplPath = path.join(hbs.viewPath, tpl + hbs.extname),
       template, rawTemplate, layoutTemplate;
 
-    locals = merge(hbs.locals, locals || {});
+    locals = merge(this.state || {}, locals || {});
+    locals = merge(hbs.locals, locals);
 
     // Initialization... move these actions into another function to remove
     // unnecessary checks
