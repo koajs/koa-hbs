@@ -15,7 +15,11 @@ describe('rendering', function() {
 
   it('should render into the response body', function (done) {
     app = testApp.create({
-      viewPath: __dirname + '/app/assets'
+      viewPath: __dirname + '/app/assets',
+      locals: {
+        title: 'hbs',
+        article: 'locals'
+      }
     });
 
     request(app.listen())
@@ -183,6 +187,17 @@ describe('rendering', function() {
           done();
         });
     });
+
+    it('should render "Bar" and "State"', function (done) {
+      request(app.listen())
+      .get('/localsState')
+      .expect(200)
+      .end(function (err, content) {
+        assert.ok(/Bar/.test(content.text));
+        assert.ok(/State/.test(content.text));
+        done();
+      });
+    });
   });
 });
 
@@ -216,7 +231,7 @@ describe('var conflict', function () {
       .get('/first')
       .expect(200)
       .end(function (err, content) {
-        assert.equal(content.text, '<h1>hbs</h1>');
+        assert.ok(content.text.indexOf('<h1>hbs</h1>') !== -1);
         done();
       });
   });
@@ -226,7 +241,7 @@ describe('var conflict', function () {
       .get('/second')
       .expect(200)
       .end(function (err, content) {
-        assert.equal(content.text, '<h1></h1>');
+        assert.ok(content.text.indexOf('<h1></h1>') !== -1);
         done();
       });
   });
