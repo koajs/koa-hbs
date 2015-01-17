@@ -53,10 +53,24 @@ hbs.registerHelper('link', function(text, url) {
   return new hbs.SafeString(result);
 });
 ```
+Your helper is then accessible in all views by using, `{{link "Google" "http://google.com"}}`
 
-`registerHelper`, `Utils`, and `SafeString` all proxy to an internal Handlebars
-instance. If passing an alternative instance of Handlebars to the middleware
-configurator, make sure to do so before registering helpers via the koa-hbs proxy of the above functions, or just register your helpers directly via your Handlebars instance.
+The `registerHelper`, `Utils`, and `SafeString` methods all proxy to an
+internal Handlebars instance. If passing an alternative instance of
+Handlebars to the middleware configurator, make sure to do so before
+registering helpers via the koa-hbs proxy of the above functions, or
+just register your helpers directly via your Handlebars instance.
+
+You can also access the current Koa context in your helper. If you want to have
+a helper that outputs the current URL, you could write a helper like the following
+and call it in any template as `{{requestURL}}`.
+
+```
+hbs.registerHelper('requestURL', function() {
+  var url = hbs.templateOptions.data.koa.request.url;
+  return url;
+});
+```
 
 ### Registering Partials
 The simple way to register partials is to stick them all in a directory, and
