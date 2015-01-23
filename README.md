@@ -1,8 +1,9 @@
+[koa]:https://github.com/koajs/koa/
+[handlebars]:http://handlebarsjs.com
 koa-hbs
 =======
 
-[Handlebars](http://handlebarsjs.com) Templates via for
-[Koa](https://github.com/koajs/koa/)
+[Handlebars][handlebars] templates for [Koa][koa]
 
 [![Build Status][travis-badge]][repo-url]
 
