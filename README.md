@@ -148,6 +148,7 @@ The plan for koa-hbs is to offer identical functionality as express-hbs
 - `layoutsPath`: Full path to layouts directory (`String`)
 - `contentHelperName`: Alter `contentFor` helper name
 - `blockHelperName`: Alter `block` helper name
+- `disableCache`: Disable template caching
 
 ### Locals
 
@@ -180,7 +181,7 @@ Here's a few things _koa-hbs_ does not plan to support unless someone can provid
 _koa-hbs_ does not support asynchronous helpers. No, really - just load your data before rendering a view. This helps on performance and separation of concerns in your app.
 
 ### Disable template caching
-For performance reasons, this feature is not supported. The render pipeline is pretty lean right now because there isn't much branching logic. There is probably a way to do this without much overhead, but due to tools like Grunt which can just reload your app when a template changes, what's the point?
+Add a new option `disableCache` for support this feature, but for performance reasons remember turn off this option for production environment.
 
 ## Credits
 Functionality and code were inspired/taken from
