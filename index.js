@@ -100,7 +100,7 @@ Hbs.prototype.configure = function (options) {
   this.defaultLayout = options.defaultLayout || '';
   this.layoutsPath = options.layoutsPath || '';
   this.locals = options.locals || {};
-
+  this.disableCache = options.disableCache || false;
   this.partialsRegistered = false;
 
   // Cache templates and layouts
@@ -168,7 +168,7 @@ Hbs.prototype.createRenderer = function() {
     if(!hbs.layoutTemplate) { hbs.layoutTemplate = yield hbs.cacheLayout(); }
 
     // Load the template
-    if(!hbs.cache[tpl]) {
+    if(hbs.disableCache || !hbs.cache[tpl]) {
       rawTemplate = yield read(tplPath);
       hbs.cache[tpl] = {
         template: hbs.handlebars.compile(rawTemplate)
