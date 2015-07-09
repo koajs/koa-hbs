@@ -1,8 +1,9 @@
+[koa]:https://github.com/koajs/koa/
+[handlebars]:http://handlebarsjs.com
 koa-hbs
 =======
 
-[Handlebars](http://handlebarsjs.com) Templates via for
-[Koa](https://github.com/koajs/koa/)
+[Handlebars][handlebars] templates for [Koa][koa]
 
 [![Build Status][travis-badge]][repo-url]
 
@@ -53,10 +54,24 @@ hbs.registerHelper('link', function(text, url) {
   return new hbs.SafeString(result);
 });
 ```
+Your helper is then accessible in all views by using, `{{link "Google" "http://google.com"}}`
 
-`registerHelper`, `Utils`, and `SafeString` all proxy to an internal Handlebars
-instance. If passing an alternative instance of Handlebars to the middleware
-configurator, make sure to do so before registering helpers via the koa-hbs proxy of the above functions, or just register your helpers directly via your Handlebars instance.
+The `registerHelper`, `Utils`, and `SafeString` methods all proxy to an
+internal Handlebars instance. If passing an alternative instance of
+Handlebars to the middleware configurator, make sure to do so before
+registering helpers via the koa-hbs proxy of the above functions, or
+just register your helpers directly via your Handlebars instance.
+
+You can also access the current Koa context in your helper. If you want to have
+a helper that outputs the current URL, you could write a helper like the following
+and call it in any template as `{{requestURL}}`.
+
+```
+hbs.registerHelper('requestURL', function() {
+  var url = hbs.templateOptions.data.koa.request.url;
+  return url;
+});
+```
 
 ### Registering Partials
 The simple way to register partials is to stick them all in a directory, and
@@ -134,6 +149,26 @@ The plan for koa-hbs is to offer identical functionality as express-hbs
 - `layoutsPath`: Full path to layouts directory (`String`)
 - `contentHelperName`: Alter `contentFor` helper name
 - `blockHelperName`: Alter `block` helper name
+- `disableCache`: Disable template caching
+
+### Locals
+
+Application local variables (```[this.state](https://github.com/koajs/koa/blob/master/docs/api/context.md#ctxstate)```) are provided to all templates rendered within the application.
+
+```javascript
+app.use(function *() {
+  this.state.title = 'My App';
+  this.state.email = 'me@myapp.com';
+});
+```
+
+The state object is a JavaScript Object. The properties added to it will be exposed as local variables within your views.
+
+```
+<title>{{title}}</title>
+
+<p>Contact : {{email}}</p>
+```
 
 ## Example
 You can run the included example via `npm install koa` and
@@ -147,7 +182,7 @@ Here's a few things _koa-hbs_ does not plan to support unless someone can provid
 _koa-hbs_ does not support asynchronous helpers. No, really - just load your data before rendering a view. This helps on performance and separation of concerns in your app.
 
 ### Disable template caching
-For performance reasons, this feature is not supported. The render pipeline is pretty lean right now because there isn't much branching logic. There is probably a way to do this without much overhead, but due to tools like Grunt which can just reload your app when a template changes, what's the point?
+Add a new option `disableCache` for support this feature, but for performance reasons remember turn off this option for production environment.
 
 ## Credits
 Functionality and code were inspired/taken from
