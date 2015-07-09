@@ -26,7 +26,7 @@ var create = function(opts) {
       ]
     });
   });
-  
+
   app.get('/nestedPartials', function*() {
     yield this.render('nestedPartials' );
   });
@@ -64,6 +64,13 @@ var create = function(opts) {
     obj.title = 'Bar';
     obj.recursive = obj;
     yield this.render('locals', obj);
+  });
+
+  app.get('/localsState', function *() {
+    this.state = { title: 'Foo', article: 'State' };
+    yield this.render('locals', {
+      title: 'Bar'
+    });
   });
   return app;
 };
