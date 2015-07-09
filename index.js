@@ -156,6 +156,12 @@ Hbs.prototype.createRenderer = function() {
     var tplPath = path.join(hbs.viewPath, tpl + hbs.extname),
       template, rawTemplate, layoutTemplate;
 
+    // if the template passed has any non-word characters leading,
+    // we're probably trying to pass an absolute path, so roll with that.
+    if (!fs.existsSync(tplPath) && !/^\w/.test(tpl)) {
+      tplPath = tpl + hbs.extname;
+    }
+
     locals = merge(hbs.locals, locals || {});
 
     // Initialization... move these actions into another function to remove
