@@ -72,6 +72,10 @@ var create = function(opts) {
       title: 'Bar'
     });
   });
+
+  app.get('/tplInOtherDir', function *() {
+    yield this.render('tplInOtherDir');
+  });
   return app;
 };
 
