@@ -253,7 +253,11 @@ describe('list of view paths', function () {
   before(function () {
     // Create app which specifies layouts
     app = testApp.create({
-      viewPath: [__dirname + '/app/assets', __dirname + '/app/otherViews'],
+      viewPath: [
+        __dirname + '/app/assets',
+        __dirname + '/app/otherViews',
+        __dirname + '/app/pathThatDoesNotExist'
+      ],
       partialsPath: __dirname + '/app/assets/partials',
       layoutsPath: __dirname + '/app/assets/layouts'
     });
