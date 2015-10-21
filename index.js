@@ -103,6 +103,10 @@ Hbs.prototype.configure = function (options) {
   this.disableCache = options.disableCache || false;
   this.partialsRegistered = false;
 
+  if (!Array.isArray(this.viewPath)) {
+    this.viewPath = [this.viewPath];
+  }
+
   // Cache templates and layouts
   this.cache = {};
 
@@ -153,7 +157,7 @@ Hbs.prototype.createRenderer = function() {
   var hbs = this;
 
   return function *(tpl, locals) {
-    var tplPath = path.join(hbs.viewPath, tpl + hbs.extname),
+    var tplPath = hbs.getTemplatePath(tpl),
       template, rawTemplate, layoutTemplate;
 
     locals = merge(this.state || {}, locals || {});
@@ -316,6 +320,28 @@ Hbs.prototype.registerPartials = function () {
     }
 
   };
+};
+
+Hbs.prototype.getTemplatePath = function getTemplatePath(tpl) {
+  var cache = (this.pathCache || (this.pathCache = {}));
+  if (cache[tpl])
+    return cache[tpl];
+
+  for (var i=0; i!==this.viewPath.length; i++) {
+    var viewPath = this.viewPath[i];
+    var tplPath = path.join(viewPath, tpl + this.extname);
+    try {
+      fs.statSync(tplPath);
+      if (!this.disableCache)
+        cache[tpl] = tplPath;
+
+      return tplPath;
+    } catch (e) {
+      continue;
+    }
+  }
+
+  return void 0;
 };
 
 /**
