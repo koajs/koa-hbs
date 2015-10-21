@@ -54,7 +54,8 @@ describe('rendering', function() {
     it('should render into the response body', function (done) {
       app = testApp.create({
         viewPath: __dirname + '/app/assets',
-        partialsPath: __dirname + '/app/assets/partials'
+        partialsPath: __dirname + '/app/assets/partials',
+        layoutsPath: __dirname + '/app/assets/layouts'
       });
       request(app.listen())
         .get('/partials')
@@ -66,13 +67,18 @@ describe('rendering', function() {
         });
     });
 
-  it('should work also for nested partials', function (done) {
-    request(app.listen())
-      .get('/nestedPartials')
-      .expect(200)
-      .end(function (err, content) {
-        assert.ok(/NESTED/.test(content.text));
-        done();
+    it('should work also for nested partials', function (done) {
+      request(app.listen())
+        .get('/nestedPartials')
+        .expect(200)
+        .end(function (err, content) {
+          console.log(content.text);
+          assert.ok(!/sidebar goes here/.test(content.text));
+          assert.ok(!/sidebar-submenu goes here/.test(content.text));
+          assert.ok(/actual content/.test(content.text));
+          assert.ok(/List elem 1/.test(content.text));
+          assert.ok(/sidebar-submenu/.test(content.text));
+          done();
       });
     });
   });
