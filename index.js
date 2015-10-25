@@ -308,7 +308,7 @@ Hbs.prototype.registerPartials = function () {
       });
 
       // Read all the partial from disk
-      partials = yield files.map(read);
+      var partials = yield files.map(read);
       for(var i=0; i!==partials.length; i++) {
         self.registerPartial(names[i], partials[i]);
       }
