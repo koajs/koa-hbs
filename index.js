@@ -169,8 +169,6 @@ Hbs.prototype.createRenderer = function() {
       yield hbs.registerPartials();
     }
 
-    if(!hbs.layoutTemplate) { hbs.layoutTemplate = yield hbs.cacheLayout(); }
-
     // Load the template
     if(hbs.disableCache || !hbs.cache[tpl]) {
       rawTemplate = yield read(tplPath);
@@ -187,7 +185,8 @@ Hbs.prototype.createRenderer = function() {
     }
 
     template = hbs.cache[tpl].template;
-    layoutTemplate = hbs.cache[tpl].layoutTemplate || hbs.layoutTemplate;
+    layoutTemplate = hbs.cache[tpl].layoutTemplate;
+    if(!layoutTemplate) { layoutTemplate = yield hbs.getLayoutTemplate(); }
 
     // Add the current koa context to templateOptions.data to provide access
     // to the request within helpers.
@@ -214,6 +213,14 @@ Hbs.prototype.getLayoutPath = function(layout) {
 
   return path.join(this.viewPath, layout + this.extname);
 };
+
+/**
+ * Lazy load default layout in cache.
+ */
+Hbs.prototype.getLayoutTemplate = function*() {
+    if(this.disableCache || !this.layoutTemplate) { this.layoutTemplate = yield this.cacheLayout(); }
+    return this.layoutTemplate;
+}
 
 /**
  * Get a default layout. If none is provided, make a noop
