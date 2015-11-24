@@ -160,6 +160,12 @@ Hbs.prototype.createRenderer = function() {
     var tplPath = hbs.getTemplatePath(tpl),
       template, rawTemplate, layoutTemplate;
 
+    if(tplPath === undefined) {
+      this.status = 500;
+      this.body = 'Template: ' + tpl + ' not found';
+      return;
+    }
+
     locals = merge(this.state || {}, locals || {});
     locals = merge(hbs.locals, locals);
 
