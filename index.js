@@ -1,4 +1,5 @@
-var fs = require('fs');
+'use strict';
+var fs = require('mz/fs');
 var path = require('path');
 var glob = require('glob');
 
@@ -15,6 +16,9 @@ var glob = require('glob');
  */
 
 var merge = function (obj1, obj2) {
+  if(Object.assign) {
+    return Object.assign({}, obj1, obj2);
+  }
   var c = {};
   var keys = Object.keys(obj2);
   for(var i=0; i!==keys.length; i++) {
@@ -41,12 +45,7 @@ var rLayoutPattern = /{{!<\s+([A-Za-z0-9\._\-\/]+)\s*}}/;
  */
 
 var read = function (filename) {
-  return new Promise(function(resolve, reject){
-    fs.readFile(filename, {encoding: 'utf8'}, function (err, rs) {
-      if(err) return reject(err);
-      return resolve(rs);
-    });
-  })
+  return fs.readFile(filename, {encoding: 'utf8'})
 };
 
 /**
@@ -119,7 +118,7 @@ Hbs.prototype.configure = function (options) {
   this.registerHelper(this.blockHelperName, function(name, options) {
     // instead of returning self.block(name), render the default content if no
     // block is given
-    val = self.block(name);
+    var val = self.block(name);
     if(val === '' && typeof options.fn === 'function') {
       val = options.fn(this);
     }
@@ -288,7 +287,7 @@ Hbs.prototype.registerPartials = function () {
     this.partialsPath = [this.partialsPath];
   }
 
-  /* thunk creator for readdirp */
+  /* promise creator for readdirp */
   var readdir = function(root) {
     return new Promise(function (resolve, reject) {
       glob('**/*' + self.extname, {
