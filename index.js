@@ -41,9 +41,12 @@ var rLayoutPattern = /{{!<\s+([A-Za-z0-9\._\-\/]+)\s*}}/;
  */
 
 var read = function (filename) {
-  return function(done) {
-    fs.readFile(filename, {encoding: 'utf8'}, done);
-  };
+  return new Promise(function(resolve, reject){
+    fs.readFile(filename, {encoding: 'utf8'}, function (err, rs) {
+      if(err) return reject(err);
+      return resolve(rs);
+    });
+  })
 };
 
 /**
@@ -153,6 +156,7 @@ Hbs.prototype.middleware = function(options) {
  * Create a render generator to be attached to koa context
  */
 
+
 Hbs.prototype.createRenderer = function() {
   var hbs = this;
 
@@ -165,7 +169,7 @@ Hbs.prototype.createRenderer = function() {
 
     // Initialization... move these actions into another function to remove
     // unnecessary checks
-    if(!hbs.partialsRegistered && hbs.partialsPath !== '') {
+    if(hbs.disableCache || !hbs.partialsRegistered && hbs.partialsPath !== '') {
       yield hbs.registerPartials();
     }
 
@@ -254,11 +258,7 @@ Hbs.prototype.cacheLayout = function(layout) {
  */
 
 Hbs.prototype.loadLayoutFile = function(layout) {
-  var hbs = this;
-  return function(done) {
-    var file = hbs.getLayoutPath(layout);
-    read(file)(done);
-  };
+  return read(this.getLayoutPath(layout));
 };
 
 /**
@@ -290,11 +290,14 @@ Hbs.prototype.registerPartials = function () {
 
   /* thunk creator for readdirp */
   var readdir = function(root) {
-    return function(done) {
+    return new Promise(function (resolve, reject) {
       glob('**/*' + self.extname, {
         cwd: root,
-      }, done);
-    };
+      }, function (err, rs) {
+        if(err) return reject(err);
+        return resolve(rs);
+      });
+    });
   };
 
   /* Read in partials and register them */
