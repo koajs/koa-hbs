@@ -161,7 +161,7 @@ Hbs.prototype.createRenderer = function() {
       template, rawTemplate, layoutTemplate;
 
     // allow absolute paths to be used
-    if (path.isAbsolut(tpl)) {
+    if (path.isAbsolute(tpl)) {
       tplPath = tpl + hbs.extname;
     }
 
