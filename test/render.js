@@ -246,3 +246,33 @@ describe('var conflict', function () {
       });
   });
 });
+
+describe('list of view paths', function () {
+  var app;
+  var server;
+  before(function () {
+    // Create app which specifies layouts
+    app = testApp.create({
+      viewPath: [
+        __dirname + '/app/assets',
+        __dirname + '/app/otherViews',
+        __dirname + '/app/pathThatDoesNotExist'
+      ],
+      partialsPath: __dirname + '/app/assets/partials',
+      layoutsPath: __dirname + '/app/assets/layouts'
+    });
+
+    server = app.listen();
+  });
+
+  it('searches for views in all paths', function () {
+    request(server)
+      .get('/tplInOtherDir')
+      .expect(200)
+      .end(function (err, content) {
+        console.log(content.text);
+        assert.ok(content.text.indexOf('I\'m in another directory!') !== -1);
+        done();
+      });
+  });
+});
