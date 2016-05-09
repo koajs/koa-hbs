@@ -156,9 +156,10 @@ The plan for koa-hbs is to offer identical functionality as express-hbs
 Application local variables (```[this.state](https://github.com/koajs/koa/blob/master/docs/api/context.md#ctxstate)```) are provided to all templates rendered within the application.
 
 ```javascript
-app.use(function *() {
+app.use(function *(next) {
   this.state.title = 'My App';
   this.state.email = 'me@myapp.com';
+  yield next;
 });
 ```
 

@@ -103,6 +103,10 @@ Hbs.prototype.configure = function (options) {
   this.disableCache = options.disableCache || false;
   this.partialsRegistered = false;
 
+  if (!Array.isArray(this.viewPath)) {
+    this.viewPath = [this.viewPath];
+  }
+
   // Cache templates and layouts
   this.cache = {};
 
@@ -153,7 +157,7 @@ Hbs.prototype.createRenderer = function() {
   var hbs = this;
 
   return function *(tpl, locals) {
-    var tplPath = path.join(hbs.viewPath, tpl + hbs.extname),
+    var tplPath = hbs.getTemplatePath(tpl),
       template, rawTemplate, layoutTemplate;
 
     // allow absolute paths to be used
@@ -169,8 +173,6 @@ Hbs.prototype.createRenderer = function() {
     if(!hbs.partialsRegistered && hbs.partialsPath !== '') {
       yield hbs.registerPartials();
     }
-
-    if(!hbs.layoutTemplate) { hbs.layoutTemplate = yield hbs.cacheLayout(); }
 
     // Load the template
     if(hbs.disableCache || !hbs.cache[tpl]) {
@@ -188,7 +190,8 @@ Hbs.prototype.createRenderer = function() {
     }
 
     template = hbs.cache[tpl].template;
-    layoutTemplate = hbs.cache[tpl].layoutTemplate || hbs.layoutTemplate;
+    layoutTemplate = hbs.cache[tpl].layoutTemplate;
+    if(!layoutTemplate) { layoutTemplate = yield hbs.getLayoutTemplate(); }
 
     // Add the current koa context to templateOptions.data to provide access
     // to the request within helpers.
@@ -215,6 +218,14 @@ Hbs.prototype.getLayoutPath = function(layout) {
 
   return path.join(this.viewPath, layout + this.extname);
 };
+
+/**
+ * Lazy load default layout in cache.
+ */
+Hbs.prototype.getLayoutTemplate = function*() {
+    if(this.disableCache || !this.layoutTemplate) { this.layoutTemplate = yield this.cacheLayout(); }
+    return this.layoutTemplate;
+}
 
 /**
  * Get a default layout. If none is provided, make a noop
@@ -309,7 +320,7 @@ Hbs.prototype.registerPartials = function () {
       });
 
       // Read all the partial from disk
-      partials = yield files.map(read);
+      var partials = yield files.map(read);
       for(var i=0; i!==partials.length; i++) {
         self.registerPartial(names[i], partials[i]);
       }
@@ -321,6 +332,28 @@ Hbs.prototype.registerPartials = function () {
     }
 
   };
+};
+
+Hbs.prototype.getTemplatePath = function getTemplatePath(tpl) {
+  var cache = (this.pathCache || (this.pathCache = {}));
+  if (cache[tpl])
+    return cache[tpl];
+
+  for (var i=0; i!==this.viewPath.length; i++) {
+    var viewPath = this.viewPath[i];
+    var tplPath = path.join(viewPath, tpl + this.extname);
+    try {
+      fs.statSync(tplPath);
+      if (!this.disableCache)
+        cache[tpl] = tplPath;
+
+      return tplPath;
+    } catch (e) {
+      continue;
+    }
+  }
+
+  return void 0;
 };
 
 /**
