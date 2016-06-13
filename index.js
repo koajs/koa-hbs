@@ -1,4 +1,5 @@
-var fs = require('fs');
+'use strict';
+var fs = require('mz/fs');
 var path = require('path');
 var glob = require('glob');
 
@@ -15,6 +16,9 @@ var glob = require('glob');
  */
 
 var merge = function (obj1, obj2) {
+  if(Object.assign) {
+    return Object.assign({}, obj1, obj2);
+  }
   var c = {};
   var keys = Object.keys(obj2);
   for(var i=0; i!==keys.length; i++) {
@@ -41,9 +45,7 @@ var rLayoutPattern = /{{!<\s+([A-Za-z0-9\._\-\/]+)\s*}}/;
  */
 
 var read = function (filename) {
-  return function(done) {
-    fs.readFile(filename, {encoding: 'utf8'}, done);
-  };
+  return fs.readFile(filename, {encoding: 'utf8'})
 };
 
 /**
@@ -116,7 +118,7 @@ Hbs.prototype.configure = function (options) {
   this.registerHelper(this.blockHelperName, function(name, options) {
     // instead of returning self.block(name), render the default content if no
     // block is given
-    val = self.block(name);
+    var val = self.block(name);
     if(val === '' && typeof options.fn === 'function') {
       val = options.fn(this);
     }
@@ -153,6 +155,7 @@ Hbs.prototype.middleware = function(options) {
  * Create a render generator to be attached to koa context
  */
 
+
 Hbs.prototype.createRenderer = function() {
   var hbs = this;
 
@@ -170,7 +173,7 @@ Hbs.prototype.createRenderer = function() {
 
     // Initialization... move these actions into another function to remove
     // unnecessary checks
-    if(!hbs.partialsRegistered && hbs.partialsPath !== '') {
+    if(hbs.disableCache || !hbs.partialsRegistered && hbs.partialsPath !== '') {
       yield hbs.registerPartials();
     }
 
@@ -259,11 +262,7 @@ Hbs.prototype.cacheLayout = function(layout) {
  */
 
 Hbs.prototype.loadLayoutFile = function(layout) {
-  var hbs = this;
-  return function(done) {
-    var file = hbs.getLayoutPath(layout);
-    read(file)(done);
-  };
+  return read(this.getLayoutPath(layout));
 };
 
 /**
@@ -293,13 +292,16 @@ Hbs.prototype.registerPartials = function () {
     this.partialsPath = [this.partialsPath];
   }
 
-  /* thunk creator for readdirp */
+  /* promise creator for readdirp */
   var readdir = function(root) {
-    return function(done) {
+    return new Promise(function (resolve, reject) {
       glob('**/*' + self.extname, {
         cwd: root,
-      }, done);
-    };
+      }, function (err, rs) {
+        if(err) return reject(err);
+        return resolve(rs);
+      });
+    });
   };
 
   /* Read in partials and register them */

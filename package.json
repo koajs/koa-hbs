@@ -21,8 +21,9 @@
   "author": "Joe Wilm <jdwilm@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "glob": "^3.2.9",
     "handlebars": "^2.0.0",
-    "glob": "^3.2.9"
+    "mz": "^2.4.0"
   },
   "devDependencies": {
     "mocha": "~2.3",
