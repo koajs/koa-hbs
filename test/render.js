@@ -66,14 +66,14 @@ describe('rendering', function() {
         });
     });
 
-  it('should work also for nested partials', function (done) {
-    request(app.listen())
-      .get('/nestedPartials')
-      .expect(200)
-      .end(function (err, content) {
-        assert.ok(/NESTED/.test(content.text));
-        done();
-      });
+    it('should work also for nested partials', function (done) {
+      request(app.listen())
+        .get('/nestedPartials')
+        .expect(200)
+        .end(function (err, content) {
+          assert.ok(/NESTED/.test(content.text));
+          done();
+        });
     });
   });
 
@@ -110,6 +110,30 @@ describe('rendering', function() {
             if(err) return done(err);
             assert.ok(/ALTERNATIVE LAYOUT/.test(content.text));
             assert.ok(/ALTERNATIVE CONTENT/.test(content.text));
+            done();
+          });
+      });
+
+      it('should support overriding layouts from locals', function (done) {
+        request(app.listen())
+          .get('/overrideLayout')
+          .expect(200)
+          .end(function (err, content) {
+            if(err) return done(err);
+            assert.ok(/OVERRIDE LAYOUT/.test(content.text));
+            assert.ok(/OVERRIDE CONTENT/.test(content.text));
+            done();
+          });
+      });
+
+      it('should support specifying no layout from locals', function (done) {
+        request(app.listen())
+          .get('/noLayout')
+          .expect(200)
+          .end(function (err, content) {
+            if(err) return done(err);
+            assert.ok(!(/ALTERNATIVE LAYOUT/.test(content.text)));
+            assert.ok(/NO LAYOUT CONTENT/.test(content.text));
             done();
           });
       });
