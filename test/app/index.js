@@ -38,6 +38,18 @@ var create = function(opts) {
     yield this.render('useAlternativeLayout');
   });
 
+  app.get('/overrideLayout', function *() {
+    yield this.render('useOverrideLayout', {
+      layout: 'override'
+    });
+  });
+
+  app.get('/noLayout', function *() {
+    yield this.render('useNoLayout', {
+      layout: false
+    });
+  });
+
   app.get('/block', function *() {
     yield this.render('usesBlockLayout');
   });

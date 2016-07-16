@@ -177,10 +177,17 @@ Hbs.prototype.createRenderer = function() {
       };
 
       // Load layout if specified
-      if(rLayoutPattern.test(rawTemplate)) {
-        var layout = rLayoutPattern.exec(rawTemplate)[1];
-        var rawLayout = yield hbs.loadLayoutFile(layout);
-        hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile(rawLayout);
+      if(typeof locals.layout !== 'undefined' || rLayoutPattern.test(rawTemplate)) {
+        var layout = locals.layout;
+
+        if (typeof layout === 'undefined') { layout = rLayoutPattern.exec(rawTemplate)[1]; }
+
+        if (layout !== false) {
+          var rawLayout = yield hbs.loadLayoutFile(layout);
+          hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile(rawLayout);
+        } else {
+          hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile('{{{body}}}');
+        }
       }
     }
 
@@ -218,8 +225,8 @@ Hbs.prototype.getLayoutPath = function(layout) {
  * Lazy load default layout in cache.
  */
 Hbs.prototype.getLayoutTemplate = function*() {
-    if(this.disableCache || !this.layoutTemplate) { this.layoutTemplate = yield this.cacheLayout(); }
-    return this.layoutTemplate;
+  if(this.disableCache || !this.layoutTemplate) { this.layoutTemplate = yield this.cacheLayout(); }
+  return this.layoutTemplate;
 }
 
 /**
@@ -229,13 +236,15 @@ Hbs.prototype.getLayoutTemplate = function*() {
 Hbs.prototype.cacheLayout = function(layout) {
   var hbs = this;
   return function* () {
+
     // Create a default layout to always use
     if(!layout && !hbs.defaultLayout) {
       return hbs.handlebars.compile('{{{body}}}');
     }
 
     // Compile the default layout if one not passed
-    if(!layout) { layout = hbs.defaultLayout; }
+    if(!layout) { 
+      layout = hbs.defaultLayout; }
 
     var layoutTemplate;
     try {
