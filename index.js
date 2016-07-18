@@ -236,15 +236,13 @@ Hbs.prototype.getLayoutTemplate = function*() {
 Hbs.prototype.cacheLayout = function(layout) {
   var hbs = this;
   return function* () {
-
     // Create a default layout to always use
     if(!layout && !hbs.defaultLayout) {
       return hbs.handlebars.compile('{{{body}}}');
     }
 
     // Compile the default layout if one not passed
-    if(!layout) { 
-      layout = hbs.defaultLayout; }
+    if(!layout) { layout = hbs.defaultLayout; }
 
     var layoutTemplate;
     try {
