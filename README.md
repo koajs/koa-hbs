@@ -188,6 +188,7 @@ Add a new option `disableCache` for support this feature, but for performance re
 ## Credits
 Functionality and code were inspired/taken from
 [express-hbs](https://github.com/barc/express-hbs/).
+Many thanks to [@jwilm](https://github.com/jwilm) for authoring this middleware. 
 
 [travis-badge]: https://travis-ci.org/jwilm/koa-hbs.png?branch=master
 [repo-url]: https://travis-ci.org/jwilm/koa-hbs

@@ -160,6 +160,11 @@ Hbs.prototype.createRenderer = function() {
     var tplPath = hbs.getTemplatePath(tpl),
       template, rawTemplate, layoutTemplate;
 
+    // allow absolute paths to be used
+    if (path.isAbsolute(tpl)) {
+      tplPath = tpl + hbs.extname;
+    }
+
     locals = merge(this.state || {}, locals || {});
     locals = merge(hbs.locals, locals);
 
