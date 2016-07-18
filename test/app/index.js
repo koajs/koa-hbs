@@ -1,6 +1,6 @@
 var hbs = require('../../index');
 var koa = require('koa');
-var router = require('koa-router');
+var router = require('koa-router')();
 
 var create = function(opts) {
   var app = koa();
@@ -11,13 +11,15 @@ var create = function(opts) {
   });
 
   app.use(_hbs.middleware(opts));
-  app.use(router(app));
+  app
+    .use(router.routes())
+    .use(router.allowedMethods());
 
-  app.get('/', function*() {
+  router.get('/', function*() {
     yield this.render('main', {title: 'test'});
   });
 
-  app.get('/partials', function*() {
+  router.get('/partials', function*() {
     yield this.render('mainWithPartials', {
       title: 'test',
       anchorList:[
@@ -27,65 +29,67 @@ var create = function(opts) {
     });
   });
 
-  app.get('/nestedPartials', function*() {
+  router.get('/nestedPartials', function*() {
     yield this.render('nestedPartials' );
   });
-  app.get('/layout', function *() {
+
+  router.get('/layout', function *() {
     yield this.render('useDefaultLayout');
   });
 
-  app.get('/altLayout', function *() {
+  router.get('/altLayout', function *() {
     yield this.render('useAlternativeLayout');
   });
 
-  app.get('/overrideLayout', function *() {
+  router.get('/overrideLayout', function *() {
     yield this.render('useOverrideLayout', {
       layout: 'override'
     });
   });
 
-  app.get('/noLayout', function *() {
+  router.get('/noLayout', function *() {
     yield this.render('useNoLayout', {
       layout: false
     });
   });
 
-  app.get('/block', function *() {
+  router.get('/block', function *() {
     yield this.render('usesBlockLayout');
   });
 
-  app.get('/blockNoReplace', function *() {
+  router.get('/blockNoReplace', function *() {
     yield this.render('usesBlockLayoutNoBlock');
   });
 
-  app.get('/empty', function *() {
+  router.get('/empty', function *() {
     yield this.render('empty');
   });
 
-  app.get('/locals', function *() {
+  router.get('/locals', function *() {
     yield this.render('locals');
   });
-  app.get('/localsOverride', function *() {
+
+  router.get('/localsOverride', function *() {
     yield this.render('locals', {
       title: 'Bar'
     });
   });
 
-  app.get('/localsRecursive', function *() {
+  router.get('/localsRecursive', function *() {
     var obj = {};
     obj.title = 'Bar';
     obj.recursive = obj;
     yield this.render('locals', obj);
   });
 
-  app.get('/localsState', function *() {
+  router.get('/localsState', function *() {
     this.state = { title: 'Foo', article: 'State' };
     yield this.render('locals', {
       title: 'Bar'
     });
   });
 
-  app.get('/tplInOtherDir', function *() {
+  router.get('/tplInOtherDir', function *() {
     yield this.render('tplInOtherDir');
   });
   return app;
