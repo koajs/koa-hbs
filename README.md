@@ -156,7 +156,8 @@ the following.
 In addition to, or alternatively, you may specify a layout to render a template
 into. Simply specify `{{!< layoutName }}` somewhere in your template. koa-hbs
 will load your layout from `layoutsPath` if defined, or from `viewPath`
-otherwise.
+otherwise. If `viewPath` is set to an Array of paths, **_the first path in the
+array will be assumed to contain the layout named._**
 
 At this time, only a single content block (`{{{body}}}`) is supported.
 
