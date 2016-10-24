@@ -92,6 +92,11 @@ var create = function(opts) {
   router.get('/tplInOtherDir', function *() {
     yield this.render('tplInOtherDir');
   });
+
+  router.get('/missingTemplate', function *() {
+    yield this.render('missingTemplate');
+  });
+
   return app;
 };
 
