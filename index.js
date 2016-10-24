@@ -47,6 +47,20 @@ var read = function (filename) {
 };
 
 /**
+ * @class MissingTemplateError
+ * @param {String} message The error message
+ * @param {Object} extra   The value of the template, relating to the error.
+ */
+function MissingTemplateError (message, extra) {
+  Error.captureStackTrace(this, this.constructor);
+  this.name = this.constructor.name;
+  this.message = message;
+  this.extra = extra;
+};
+
+require('util').inherits(MissingTemplateError, Error);
+
+/**
  * expose default instance of `Hbs`
  */
 
@@ -159,6 +173,10 @@ Hbs.prototype.createRenderer = function() {
   return function *(tpl, locals) {
     var tplPath = hbs.getTemplatePath(tpl),
       template, rawTemplate, layoutTemplate;
+
+    if (!tplPath) {
+      throw new MissingTemplateError('The template specified does not exist.', tplPath);
+    }
 
     // allow absolute paths to be used
     if (path.isAbsolute(tpl)) {
