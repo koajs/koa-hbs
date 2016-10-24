@@ -50,6 +50,23 @@ describe('rendering', function() {
     });
   });
 
+  describe('with a bad template', function () {
+    it('should not render a missing template', function (done) {
+      app = testApp.create({
+        viewPath: __dirname + '/app/assets'
+      });
+
+      request(app.listen())
+        .get('/missingTemplate')
+        .expect(500)
+        .end(function (err, page) {
+          if(err) return done(err);
+          assert.deepEqual(page.text, 'Internal Server Error');
+          done();
+        });
+    });
+  });
+
   describe('with partials', function () {
     it('should render into the response body', function (done) {
       app = testApp.create({
