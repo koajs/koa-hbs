@@ -38,7 +38,52 @@ accepts two arguements - the template to render, and an object containing local
 variables to be inserted into the template. The result is assigned to Koa's
 `this.response.body`.
 
-### Registering Helpers
+## Options
+The plan for koa-hbs is to offer identical functionality as express-hbs
+(eventaully). These options are supported _now_.
+
+#### `viewPath` _required_
+Type: `Array|String`  
+Full path from which to load templates
+
+#### `handlebars`
+Type:`Object:Handlebars`  
+Pass your own instance of handlebars
+
+#### `templateOptions`
+Type: `Object`  
+Hash of [handlebars options](http://handlebarsjs.com/execution.html#Options) to
+pass to `template()`
+
+#### `extname`
+Type:`String`  
+Alter the default template extension (default: `'.hbs'`)
+
+#### `partialsPath`
+Type:`Array|String`  
+Full path to partials directory
+
+#### `defaultLayout`
+Type:`String`  
+Name of the default layout
+
+#### `layoutsPath`
+Type:`String`  
+Full path to layouts directory
+
+#### `contentHelperName`
+Type:`String`  
+Alter `contentFor` helper name
+
+#### `blockHelperName`
+Type:`String`  
+Alter `block` helper name
+
+#### `disableCache`
+Type:`Boolean`  
+Disable template caching
+
+## Registering Helpers
 Helpers are registered using the #registerHelper method. Here is an example
 using the default instance (helper stolen from official Handlebars
 [docs](http://handlebarsjs.com):
@@ -74,7 +119,7 @@ hbs.registerHelper('requestURL', function() {
 });
 ```
 
-### Registering Partials
+## Registering Partials
 The simple way to register partials is to stick them all in a directory, and
 pass the `partialsPath` option when generating the middleware. Say your views
 are in `./views`, and your partials are in `./views/partials`. Configuring the
@@ -91,7 +136,7 @@ will cause them to be automatically registered. Alternatively, you may register
 partials one at a time by calling `hbs.registerPartial` which proxies to the
 cached handlebars `#registerPartial` method.
 
-### Layouts
+## Layouts
 Passing `defaultLayout` with the a layout name will cause all templates to be
 inserted into the `{{{body}}}` expression of the layout. This might look like
 the following.
@@ -115,7 +160,7 @@ otherwise.
 
 At this time, only a single content block (`{{{body}}}`) is supported.
 
-#### Overriding Layouts using Locals
+## Overriding Layouts using Locals
 
 As of version 0.9.0, it's possible to override the layout used for rendering,
 using `locals`. For example:
@@ -131,7 +176,7 @@ router.get('/', function *() {
 See the [tests](https://github.com/gilt/koa-hbs/blob/master/test/app/index.js#L44)
 for more.
 
-### Block content
+## Block content
 Reserve areas in a layout by using the `block` helper like so.
 
 ```html
@@ -152,25 +197,13 @@ block.
 {{/contentFor}}
 ```
 
-### Options
-The plan for koa-hbs is to offer identical functionality as express-hbs
-(eventaully). These options are supported _now_.
+## Disable Template Caching
+To disable the caching of templates and partials, use the `disableCache` option.
+Set this option to `true` to disable caching. Default is `false`.
+*Remember to set this option to `false` for production environments, or performance
+could be impacted!*
 
-- `viewPath`: [_required_] Full path from which to load templates
-  (`Array|String`)
-- `handlebars`: Pass your own instance of handlebars
-- `templateOptions`: Hash of
-  [handlebars options](http://handlebarsjs.com/execution.html#Options) to pass
-  to `template()`
-- `extname`: Alter the default template extension (default: `'.hbs'`)
-- `partialsPath`: Full path to partials directory (`Array|String`)
-- `defaultLayout`: Name of the default layout
-- `layoutsPath`: Full path to layouts directory (`String`)
-- `contentHelperName`: Alter `contentFor` helper name
-- `blockHelperName`: Alter `block` helper name
-- `disableCache`: Disable template caching
-
-### Locals
+## Locals
 
 Application local variables (```[this.state](https://github.com/koajs/koa/blob/master/docs/api/context.md#ctxstate)```) are provided to all templates rendered within the application.
 
@@ -204,10 +237,6 @@ provide really compelling justification.
 _koa-hbs_ does not support asynchronous helpers. No, really - just load your
 data before rendering a view. This helps on performance and separation of
 concerns in your app.
-
-### Disable template caching
-Add a new option `disableCache` for support this feature, but for performance
-reasons remember turn off this option for production environment.
 
 ## Handlebars Version
 
