@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var glob = require('glob');
+var util = require('util');
 
 /**
  * Shallow copy two objects into a new object
@@ -58,7 +59,21 @@ function MissingTemplateError (message, extra) {
   this.extra = extra;
 };
 
-require('util').inherits(MissingTemplateError, Error);
+util.inherits(MissingTemplateError, Error);
+
+/**
+ * @class BadOptionsError
+ * @param {String} message The error message
+ * @param {Object} extra   Misc infomration.
+ */
+function BadOptionsError (message, extra) {
+  Error.captureStackTrace(this, this.constructor);
+  this.name = this.constructor.name;
+  this.message = message;
+  this.extra = extra;
+};
+
+util.inherits(BadOptionsError, Error);
 
 /**
  * expose default instance of `Hbs`
@@ -100,7 +115,7 @@ Hbs.prototype.configure = function (options) {
 
   var self = this;
 
-  if(!options.viewPath) { throw new Error('must specify view path'); }
+  if(!options.viewPath) { throw new BadOptionsError('The option `viewPath` must be specified.'); }
 
   // Attach options
   options = options || {};
@@ -241,7 +256,7 @@ Hbs.prototype.getLayoutPath = function(layout) {
     return path.join(this.layoutsPath, layout + this.extname);
   }
 
-  return path.join(this.viewPath, layout + this.extname);
+  return path.join(this.viewPath[0], layout + this.extname);
 };
 
 /**
