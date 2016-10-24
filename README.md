@@ -10,7 +10,8 @@ koa-hbs
 ## Usage
 koa-hbs is middleware. We stash an instance of koa-hbs for you in the library
 so you don't have to manage it separately. Configure the default instance by
-passing an [options](#options) hash to #middleware. To render a template then, just `yield this.render('templateName');`. Here's a basic app demonstrating all that:
+passing an [options](#options) hash to #middleware. To render a template then,
+just `yield this.render('templateName');`. Here's a basic app demonstrating all that:
 
 ```javascript
 var koa = require('koa');
@@ -86,7 +87,9 @@ app.use(hbs.middleware({
 }));
 ```
 
-will cause them to be automatically registered. Alternatively, you may register partials one at a time by calling `hbs.registerPartial` which proxies to the cached handlebars `#registerPartial` method.
+will cause them to be automatically registered. Alternatively, you may register
+partials one at a time by calling `hbs.registerPartial` which proxies to the
+cached handlebars `#registerPartial` method.
 
 ### Layouts
 Passing `defaultLayout` with the a layout name will cause all templates to be
@@ -111,6 +114,22 @@ will load your layout from `layoutsPath` if defined, or from `viewPath`
 otherwise.
 
 At this time, only a single content block (`{{{body}}}`) is supported.
+
+#### Overriding Layouts using Locals
+
+As of version 0.9.0, it's possible to override the layout used for rendering,
+using `locals`. For example:
+
+```js
+router.get('/', function *() {
+  yield this.render('foo', {
+    layout: 'bar'
+  });
+ });
+ ```
+
+See the [tests](https://github.com/gilt/koa-hbs/blob/master/test/app/index.js#L44)
+for more.
 
 ### Block content
 Reserve areas in a layout by using the `block` helper like so.
@@ -163,7 +182,8 @@ app.use(function *(next) {
 });
 ```
 
-The state object is a JavaScript Object. The properties added to it will be exposed as local variables within your views.
+The state object is a JavaScript Object. The properties added to it will be
+exposed as local variables within your views.
 
 ```
 <title>{{title}}</title>
@@ -177,18 +197,29 @@ You can run the included example via `npm install koa` and
 
 ## Unsupported Features
 
-Here's a few things _koa-hbs_ does not plan to support unless someone can provide really compelling justification.
+Here's a few things _koa-hbs_ does not plan to support unless someone can
+provide really compelling justification.
 
 ### Async Helpers
-_koa-hbs_ does not support asynchronous helpers. No, really - just load your data before rendering a view. This helps on performance and separation of concerns in your app.
+_koa-hbs_ does not support asynchronous helpers. No, really - just load your
+data before rendering a view. This helps on performance and separation of
+concerns in your app.
 
 ### Disable template caching
-Add a new option `disableCache` for support this feature, but for performance reasons remember turn off this option for production environment.
+Add a new option `disableCache` for support this feature, but for performance
+reasons remember turn off this option for production environment.
+
+## Handlebars Version
+
+As of koa-hbs@0.9.0, the version of the Handlebars dependency bundled with this
+module has been updated to 4.0.x. If this causes conflicts for your project, you
+may pass your own instance of Handlebars to the module, or downgrade to the last
+0.8.x version.
 
 ## Credits
 Functionality and code were inspired/taken from
 [express-hbs](https://github.com/barc/express-hbs/).
-Many thanks to [@jwilm](https://github.com/jwilm) for authoring this middleware. 
+Many thanks to [@jwilm](https://github.com/jwilm) for authoring this middleware.
 
-[travis-badge]: https://travis-ci.org/jwilm/koa-hbs.png?branch=master
-[repo-url]: https://travis-ci.org/jwilm/koa-hbs
+[travis-badge]: https://travis-ci.org/gilt/koa-hbs.png?branch=master
+[repo-url]: https://travis-ci.org/gilt/koa-hbs
