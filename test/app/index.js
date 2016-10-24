@@ -41,6 +41,18 @@ var create = function(opts) {
     yield this.render('useAlternativeLayout');
   });
 
+  router.get('/overrideLayout', function *() {
+    yield this.render('useOverrideLayout', {
+      layout: 'override'
+    });
+  });
+
+  router.get('/noLayout', function *() {
+    yield this.render('useNoLayout', {
+      layout: false
+    });
+  });
+
   router.get('/block', function *() {
     yield this.render('usesBlockLayout');
   });

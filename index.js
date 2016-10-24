@@ -182,10 +182,17 @@ Hbs.prototype.createRenderer = function() {
       };
 
       // Load layout if specified
-      if(rLayoutPattern.test(rawTemplate)) {
-        var layout = rLayoutPattern.exec(rawTemplate)[1];
-        var rawLayout = yield hbs.loadLayoutFile(layout);
-        hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile(rawLayout);
+      if(typeof locals.layout !== 'undefined' || rLayoutPattern.test(rawTemplate)) {
+        var layout = locals.layout;
+
+        if (typeof layout === 'undefined') { layout = rLayoutPattern.exec(rawTemplate)[1]; }
+
+        if (layout !== false) {
+          var rawLayout = yield hbs.loadLayoutFile(layout);
+          hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile(rawLayout);
+        } else {
+          hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile('{{{body}}}');
+        }
       }
     }
 
@@ -223,8 +230,8 @@ Hbs.prototype.getLayoutPath = function(layout) {
  * Lazy load default layout in cache.
  */
 Hbs.prototype.getLayoutTemplate = function*() {
-    if(this.disableCache || !this.layoutTemplate) { this.layoutTemplate = yield this.cacheLayout(); }
-    return this.layoutTemplate;
+  if(this.disableCache || !this.layoutTemplate) { this.layoutTemplate = yield this.cacheLayout(); }
+  return this.layoutTemplate;
 }
 
 /**
