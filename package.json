@@ -1,13 +1,13 @@
 {
   "name": "koa-hbs",
-  "version": "0.8.2",
+  "version": "0.9.0",
   "description": "Handlebars Templates via Generators for Koa",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jwilm/koa-hbs.git"
+    "url": "https://github.com/gilt/koa-hbs.git"
   },
-  "homepage": "https://github.com/jwilm/koa-hbs/",
+  "homepage": "https://github.com/gilt/koa-hbs/",
   "scripts": {
     "test": "make test"
   },
@@ -21,15 +21,15 @@
   "author": "Joe Wilm <jdwilm@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "handlebars": "^2.0.0",
-    "glob": "^7.0.5"
+    "glob": "^7.0.5",
+    "handlebars": "^4.0.5"
   },
   "devDependencies": {
-    "co": "^3.0.5",
+    "co": "^4.6.0",
     "koa": "^1.2.0",
     "koa-router": "^5.4.0",
-    "mocha": "~3.0.0-0",
-    "supertest": "^1.2.0"
+    "mocha": "^3.1.2",
+    "supertest": "^2.0.1"
   },
   "engines": {
     "node": ">= 4.0.0"
