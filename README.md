@@ -225,6 +225,15 @@ exposed as local variables within your views.
 <p>Contact : {{email}}</p>
 ```
 
+## Koa2
+
+Until Koa2 support is included by default in the module, you can use a few
+supporting modules to achieve the same result. We've put together an example
+repo that demonstrates how to use `koa-hbs` with Koa2:
+[koa-hbs-koa2-howto](https://github.com/shellscape/koa-hbs-koa2-howto)
+
+Credit to [@chrisveness](https://github.com/chrisveness) for the initial investigation.
+
 ## Example
 You can run the included example via `npm install koa` and
 `node --harmony app.js` from the example folder.
