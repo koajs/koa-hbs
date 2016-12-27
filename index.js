@@ -207,7 +207,7 @@ Hbs.prototype.createRenderer = function () {
 
     // Initialization... move these actions into another function to remove
     // unnecessary checks
-    if (hbs.disableCache || !hbs.partialsRegistered && hbs.partialsPath !== '') {
+    if (hbs.disableCache || !hbs.partialsRegistered && hbs.partialsPath && hbs.partialsPath.length > 0) {
       await hbs.registerPartials();
     }
 
