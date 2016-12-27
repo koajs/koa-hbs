@@ -21,7 +21,7 @@
   "author": "Joe Wilm <jdwilm@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "glob": "^7.0.5",
+    "glob": "^7.1.1",
     "handlebars": "^4.0.5"
   },
   "devDependencies": {
