@@ -10,10 +10,11 @@ describe('without required options', function () {
   });
 });
 
-describe('rendering', function() {
+describe('rendering', function () {
   var app;
 
   it('should render into the response body', function (done) {
+    debugger;
     app = testApp.create({
       viewPath: __dirname + '/app/assets',
       locals: {
@@ -26,7 +27,7 @@ describe('rendering', function() {
       .get('/')
       .expect(200)
       .end(function (err, content) {
-        if(err) return done(err);
+        if (err) return done(err);
         assert.ok(/<title>test<\/title>/.test(content.text));
         assert.ok(/html/.test(content.text));
         done();
@@ -43,7 +44,7 @@ describe('rendering', function() {
         .get('/empty')
         .expect(200)
         .end(function (err, page) {
-          if(err) return done(err);
+          if (err) return done(err);
           assert.deepEqual(page.text, '');
           done();
         });
@@ -60,7 +61,7 @@ describe('rendering', function() {
         .get('/missingTemplate')
         .expect(500)
         .end(function (err, page) {
-          if(err) return done(err);
+          if (err) return done(err);
           assert.deepEqual(page.text, 'Internal Server Error');
           done();
         });
@@ -77,20 +78,20 @@ describe('rendering', function() {
         .get('/partials')
         .expect(200)
         .end(function (err, content) {
-          if(err) return done(err);
+          if (err) return done(err);
           assert.ok(/google\.com/.test(content.text));
           done();
         });
     });
 
-  it('should work also for nested partials', function (done) {
-    request(app.listen())
-      .get('/nestedPartials')
-      .expect(200)
-      .end(function (err, content) {
-        assert.ok(/NESTED/.test(content.text));
-        done();
-      });
+    it('should work also for nested partials', function (done) {
+      request(app.listen())
+        .get('/nestedPartials')
+        .expect(200)
+        .end(function (err, content) {
+          assert.ok(/NESTED/.test(content.text));
+          done();
+        });
     });
   });
 
@@ -112,7 +113,7 @@ describe('rendering', function() {
           .get('/layout')
           .expect(200)
           .end(function (err, content) {
-            if(err) return done(err);
+            if (err) return done(err);
             assert.ok(/DEFAULT LAYOUT/.test(content.text));
             assert.ok(/DEFAULT CONTENT/.test(content.text));
             done();
@@ -124,7 +125,7 @@ describe('rendering', function() {
           .get('/altLayout')
           .expect(200)
           .end(function (err, content) {
-            if(err) return done(err);
+            if (err) return done(err);
             assert.ok(/ALTERNATIVE LAYOUT/.test(content.text));
             assert.ok(/ALTERNATIVE CONTENT/.test(content.text));
             done();
@@ -136,7 +137,7 @@ describe('rendering', function() {
           .get('/overrideLayout')
           .expect(200)
           .end(function (err, content) {
-            if(err) return done(err);
+            if (err) return done(err);
             assert.ok(/OVERRIDE LAYOUT/.test(content.text));
             assert.ok(/OVERRIDE CONTENT/.test(content.text));
             done();
@@ -148,7 +149,7 @@ describe('rendering', function() {
           .get('/noLayout')
           .expect(200)
           .end(function (err, content) {
-            if(err) return done(err);
+            if (err) return done(err);
             assert.ok(!(/ALTERNATIVE LAYOUT/.test(content.text)));
             assert.ok(/NO LAYOUT CONTENT/.test(content.text));
             done();
@@ -156,7 +157,7 @@ describe('rendering', function() {
       });
     });
 
-    describe('with block content', function() {
+    describe('with block content', function () {
       it('should show default without content for', function (done) {
         request(app.listen())
           .get('/blockNoReplace')
@@ -201,7 +202,7 @@ describe('rendering', function() {
         .get('/localsRecursive')
         .expect(200)
         .end(function (err, content) {
-          if(err) {
+          if (err) {
             return done(err);
           }
 
@@ -231,23 +232,23 @@ describe('rendering', function() {
 
     it('should render "Bar" and "State"', function (done) {
       request(app.listen())
-      .get('/localsState')
-      .expect(200)
-      .end(function (err, content) {
-        assert.ok(/Bar/.test(content.text));
-        assert.ok(/State/.test(content.text));
-        done();
-      });
+        .get('/localsState')
+        .expect(200)
+        .end(function (err, content) {
+          assert.ok(/Bar/.test(content.text));
+          assert.ok(/State/.test(content.text));
+          done();
+        });
     });
   });
 });
 
 describe('var conflict', function () {
-  var app = koa();
+  var app = new koa();
   app.use(hbs.middleware({
     viewPath: __dirname + '/app/assets'
   }));
-  app.use(function * () {
+  app.use(function* () {
     if (this.url === '/first') {
       yield this.render('locals', {
         title: 'hbs'
