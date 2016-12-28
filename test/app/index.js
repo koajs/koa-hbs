@@ -2,100 +2,101 @@ var hbs = require('../../index');
 var koa = require('koa');
 var router = require('koa-router')();
 
-var create = function(opts) {
-  var app = koa();
+var create = function (opts) {
+  var app = new koa();
   var _hbs = hbs.create();
 
-  app.on('error', function(err) {
+  app.on('error', function (err) {
     console.error(err.stack);
   });
 
   app.use(_hbs.middleware(opts));
-  app
-    .use(router.routes())
-    .use(router.allowedMethods());
 
-  router.get('/', function*() {
-    yield this.render('main', {title: 'test'});
+  router.get('/', async function (ctx) {
+    await ctx.render('main', { title: 'test' });
   });
 
-  router.get('/partials', function*() {
-    yield this.render('mainWithPartials', {
+  router.get('/partials', async function (ctx) {
+    await ctx.render('mainWithPartials', {
       title: 'test',
-      anchorList:[
-        {url: 'https://google.com', name: 'google'},
-        {url: 'https://github.com', name: 'github'}
+      anchorList: [
+        { url: 'https://google.com', name: 'google' },
+        { url: 'https://github.com', name: 'github' }
       ]
     });
   });
 
-  router.get('/nestedPartials', function*() {
-    yield this.render('nestedPartials' );
+  router.get('/nestedPartials', async function (ctx) {
+    await ctx.render('nestedPartials');
   });
 
-  router.get('/layout', function *() {
-    yield this.render('useDefaultLayout');
+  router.get('/layout', async function (ctx) {
+    await ctx.render('useDefaultLayout');
   });
 
-  router.get('/altLayout', function *() {
-    yield this.render('useAlternativeLayout');
+  router.get('/altLayout', async function (ctx) {
+    await ctx.render('useAlternativeLayout');
   });
 
-  router.get('/overrideLayout', function *() {
-    yield this.render('useOverrideLayout', {
+  router.get('/overrideLayout', async function (ctx) {
+    await ctx.render('useOverrideLayout', {
       layout: 'override'
     });
   });
 
-  router.get('/noLayout', function *() {
-    yield this.render('useNoLayout', {
+  router.get('/noLayout', async function (ctx) {
+    await ctx.render('useNoLayout', {
       layout: false
     });
   });
 
-  router.get('/block', function *() {
-    yield this.render('usesBlockLayout');
+  router.get('/block', async function (ctx) {
+    await ctx.render('usesBlockLayout');
   });
 
-  router.get('/blockNoReplace', function *() {
-    yield this.render('usesBlockLayoutNoBlock');
+  router.get('/blockNoReplace', async function (ctx) {
+    await ctx.render('usesBlockLayoutNoBlock');
   });
 
-  router.get('/empty', function *() {
-    yield this.render('empty');
+  router.get('/empty', async function (ctx) {
+    await ctx.render('empty');
   });
 
-  router.get('/locals', function *() {
-    yield this.render('locals');
+  router.get('/locals', async function (ctx) {
+    await ctx.render('locals');
   });
 
-  router.get('/localsOverride', function *() {
-    yield this.render('locals', {
+  router.get('/localsOverride', async function (ctx) {
+    await ctx.render('locals', {
       title: 'Bar'
     });
   });
 
-  router.get('/localsRecursive', function *() {
+  router.get('/localsRecursive', async function (ctx) {
     var obj = {};
     obj.title = 'Bar';
     obj.recursive = obj;
-    yield this.render('locals', obj);
+    await ctx.render('locals', obj);
   });
 
-  router.get('/localsState', function *() {
-    this.state = { title: 'Foo', article: 'State' };
-    yield this.render('locals', {
+  router.get('/localsState', async function (ctx) {
+    ctx.state = { title: 'Foo', article: 'State' };
+    await ctx.render('locals', {
       title: 'Bar'
     });
   });
 
-  router.get('/tplInOtherDir', function *() {
-    yield this.render('tplInOtherDir');
+  router.get('/tplInOtherDir', async function (ctx) {
+    await ctx.render('tplInOtherDir');
   });
 
-  router.get('/missingTemplate', function *() {
-    yield this.render('missingTemplate');
+  router.get('/missingTemplate', async function (ctx) {
+    await ctx.render('missingTemplate');
   });
+
+  app
+    .use(router.routes())
+    .use(router.allowedMethods());
 
   return app;
 };

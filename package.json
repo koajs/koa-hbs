@@ -21,13 +21,13 @@
   "author": "Joe Wilm <jdwilm@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "glob": "^7.0.5",
+    "glob": "^7.1.1",
     "handlebars": "^4.0.5"
   },
   "devDependencies": {
     "co": "^4.6.0",
-    "koa": "^1.2.0",
-    "koa-router": "^5.4.0",
+    "koa": "^2.0.0-alpha.7",
+    "koa-router": "^7.0.1",
     "mocha": "^3.1.2",
     "supertest": "^2.0.1"
   },
