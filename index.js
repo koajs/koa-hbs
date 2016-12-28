@@ -1,7 +1,7 @@
-var fs = require('fs');
-var path = require('path');
-var glob = require('glob');
-var util = require('util');
+var fs=require('fs');
+var path=require('path');
+var glob=require('glob');
+var util=require('util');
 
 /**
  * Shallow copy two objects into a new object
@@ -15,40 +15,40 @@ var util = require('util');
  * @api private
  */
 
-var merge = function (obj1, obj2) {
-  var c = {};
-  var keys = Object.keys(obj2);
-  for (var i = 0; i !== keys.length; i++) {
-    c[keys[i]] = obj2[keys[i]];
-  }
-
-  keys = Object.keys(obj1);
-  for (i = 0; i !== keys.length; i++) {
-    if (!c.hasOwnProperty(keys[i])) {
-      c[keys[i]] = obj1[keys[i]];
+var merge=function(obj1, obj2) {
+    var c={};
+    var keys=Object.keys(obj2);
+    for(var i=0; i!==keys.length; i++) {
+        c[keys[i]]=obj2[keys[i]];
     }
-  }
 
-  return c;
+    keys=Object.keys(obj1);
+    for(i=0; i!==keys.length; i++) {
+        if(!c.hasOwnProperty(keys[i])) {
+            c[keys[i]]=obj1[keys[i]];
+        }
+    }
+
+    return c;
 };
 
 
 /* Capture the layout name; thanks express-hbs */
-var rLayoutPattern = /{{!<\s+([A-Za-z0-9\._\-\/]+)\s*}}/;
+var rLayoutPattern=/{{!<\s+([A-Za-z0-9\._\-\/]+)\s*}}/;
 
 /**
  * file reader returning a promise
  * @param filename {String} Name of file to read
  */
 
-var read = function (filename) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(filename, { encoding: 'utf8' }, (err, data) => {
-      if (err)
-        return reject(err);
-      resolve(data);
+var read=function(filename) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(filename, { encoding: 'utf8' }, (err, data) => {
+            if(err)
+                return reject(err);
+            resolve(data);
+        });
     });
-  });
 };
 
 /**
@@ -57,10 +57,10 @@ var read = function (filename) {
  * @param {Object} extra   The value of the template, relating to the error.
  */
 function MissingTemplateError(message, extra) {
-  Error.captureStackTrace(this, this.constructor);
-  this.name = this.constructor.name;
-  this.message = message;
-  this.extra = extra;
+    Error.captureStackTrace(this, this.constructor);
+    this.name=this.constructor.name;
+    this.message=message;
+    this.extra=extra;
 };
 
 util.inherits(MissingTemplateError, Error);
@@ -71,10 +71,10 @@ util.inherits(MissingTemplateError, Error);
  * @param {Object} extra   Misc infomration.
  */
 function BadOptionsError(message, extra) {
-  Error.captureStackTrace(this, this.constructor);
-  this.name = this.constructor.name;
-  this.message = message;
-  this.extra = extra;
+    Error.captureStackTrace(this, this.constructor);
+    this.name=this.constructor.name;
+    this.message=message;
+    this.extra=extra;
 };
 
 util.inherits(BadOptionsError, Error);
@@ -83,14 +83,14 @@ util.inherits(BadOptionsError, Error);
  * expose default instance of `Hbs`
  */
 
-exports = module.exports = new Hbs();
+exports=module.exports=new Hbs();
 
 /**
  * expose method to create additional instances of `Hbs`
  */
 
-exports.create = function () {
-  return new Hbs();
+exports.create=function() {
+    return new Hbs();
 };
 
 
@@ -101,12 +101,12 @@ exports.create = function () {
  */
 
 function Hbs() {
-  if (!(this instanceof Hbs)) { return new Hbs(); }
+    if(!(this instanceof Hbs)) { return new Hbs(); }
 
-  this.handlebars = require('handlebars').create();
+    this.handlebars=require('handlebars').create();
 
-  this.Utils = this.handlebars.Utils;
-  this.SafeString = this.handlebars.SafeString;
+    this.Utils=this.handlebars.Utils;
+    this.SafeString=this.handlebars.SafeString;
 }
 
 /**
@@ -115,54 +115,54 @@ function Hbs() {
  * @api private
  */
 
-Hbs.prototype.configure = function (options) {
+Hbs.prototype.configure=function(options) {
 
-  var self = this;
+    var self=this;
 
-  if (!options.viewPath) { throw new BadOptionsError('The option `viewPath` must be specified.'); }
+    if(!options.viewPath) { throw new BadOptionsError('The option `viewPath` must be specified.'); }
 
-  // Attach options
-  options = options || {};
-  this.viewPath = options.viewPath;
-  this.handlebars = options.handlebars || this.handlebars;
-  this.templateOptions = options.templateOptions || {};
-  this.extname = options.extname || '.hbs';
-  this.partialsPath = options.partialsPath || [];
-  this.contentHelperName = options.contentHelperName || 'contentFor';
-  this.blockHelperName = options.blockHelperName || 'block';
-  this.defaultLayout = options.defaultLayout || '';
-  this.layoutsPath = options.layoutsPath || '';
-  this.locals = options.locals || {};
-  this.disableCache = options.disableCache || false;
-  this.partialsRegistered = false;
+    // Attach options
+    options=options||{};
+    this.viewPath=options.viewPath;
+    this.handlebars=options.handlebars||this.handlebars;
+    this.templateOptions=options.templateOptions||{};
+    this.extname=options.extname||'.hbs';
+    this.partialsPath=options.partialsPath||[];
+    this.contentHelperName=options.contentHelperName||'contentFor';
+    this.blockHelperName=options.blockHelperName||'block';
+    this.defaultLayout=options.defaultLayout||'';
+    this.layoutsPath=options.layoutsPath||'';
+    this.locals=options.locals||{};
+    this.disableCache=options.disableCache||false;
+    this.partialsRegistered=false;
 
-  if (!Array.isArray(this.viewPath)) {
-    this.viewPath = [this.viewPath];
-  }
-
-  // Cache templates and layouts
-  this.cache = {};
-
-  this.blocks = {};
-
-  // block helper
-  this.registerHelper(this.blockHelperName, function (name, options) {
-    // instead of returning self.block(name), render the default content if no
-    // block is given
-    val = self.block(name);
-    if (val === '' && typeof options.fn === 'function') {
-      val = options.fn(this);
+    if(!Array.isArray(this.viewPath)) {
+        this.viewPath=[this.viewPath];
     }
 
-    return val;
-  });
+    // Cache templates and layouts
+    this.cache={};
 
-  // contentFor helper
-  this.registerHelper(this.contentHelperName, function (name, options) {
-    return self.content(name, options, this);
-  });
+    this.blocks={};
 
-  return this;
+    // block helper
+    this.registerHelper(this.blockHelperName, function(name, options) {
+        // instead of returning self.block(name), render the default content if no
+        // block is given
+        val=self.block(name);
+        if(val===''&&typeof options.fn==='function') {
+            val=options.fn(this);
+        }
+
+        return val;
+    });
+
+    // contentFor helper
+    this.registerHelper(this.contentHelperName, function(name, options) {
+        return self.content(name, options, this);
+    });
+
+    return this;
 };
 
 /**
@@ -171,254 +171,254 @@ Hbs.prototype.configure = function (options) {
  * @api public
  */
 
-Hbs.prototype.middleware = function (options) {
-  this.configure(options);
+Hbs.prototype.middleware=function(options) {
+    this.configure(options);
 
-  var render = this.createRenderer();
+    var render=this.createRenderer();
 
-  return async function (ctx, next) {
-    ctx.render = render;
-    await next();
-  };
+    return async function(ctx, next) {
+        ctx.render=render;
+        await next();
+    };
 };
 
 /**
  * Create a render generator to be attached to koa context
  */
 
-Hbs.prototype.createRenderer = function () {
-  var hbs = this;
+Hbs.prototype.createRenderer=function() {
+    var hbs=this;
 
-  return async function (tpl, locals) {
-    var tplPath = hbs.getTemplatePath(tpl),
-      template, rawTemplate, layoutTemplate;
+    return async function(tpl, locals) {
+        var tplPath=hbs.getTemplatePath(tpl),
+            template, rawTemplate, layoutTemplate;
 
-    if (!tplPath) {
-      throw new MissingTemplateError('The template specified does not exist.', tplPath);
-    }
-
-    // allow absolute paths to be used
-    if (path.isAbsolute(tpl)) {
-      tplPath = tpl + hbs.extname;
-    }
-
-    locals = merge(this.state || {}, locals || {});
-    locals = merge(hbs.locals, locals);
-
-    // Initialization... move these actions into another function to remove
-    // unnecessary checks
-    if (hbs.disableCache || !hbs.partialsRegistered && hbs.partialsPath && hbs.partialsPath.length > 0) {
-      await hbs.registerPartials();
-    }
-
-    // Load the template
-    if (hbs.disableCache || !hbs.cache[tpl]) {
-      rawTemplate = await read(tplPath);
-      hbs.cache[tpl] = {
-        template: hbs.handlebars.compile(rawTemplate)
-      };
-
-      // Load layout if specified
-      if (typeof locals.layout !== 'undefined' || rLayoutPattern.test(rawTemplate)) {
-        var layout = locals.layout;
-
-        if (typeof layout === 'undefined') { layout = rLayoutPattern.exec(rawTemplate)[1]; }
-
-        if (layout !== false) {
-          var rawLayout = await hbs.loadLayoutFile(layout);
-          hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile(rawLayout);
-        } else {
-          hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile('{{{body}}}');
+        if(!tplPath) {
+            throw new MissingTemplateError('The template specified does not exist.', tplPath);
         }
-      }
-    }
 
-    template = hbs.cache[tpl].template;
-    layoutTemplate = hbs.cache[tpl].layoutTemplate;
-    if (!layoutTemplate) { layoutTemplate = await hbs.getLayoutTemplate(); }
+        // allow absolute paths to be used
+        if(path.isAbsolute(tpl)) {
+            tplPath=tpl+hbs.extname;
+        }
 
-    // Add the current koa context to templateOptions.data to provide access
-    // to the request within helpers.
-    if (!hbs.templateOptions.data) {
-      hbs.templateOptions.data = {};
-    }
+        locals=merge(this.state||{}, locals||{});
+        locals=merge(hbs.locals, locals);
 
-    hbs.templateOptions.data = merge(hbs.templateOptions.data, { koa: this });
+        // Initialization... move these actions into another function to remove
+        // unnecessary checks
+        if(hbs.disableCache||!hbs.partialsRegistered&&hbs.partialsPath&&hbs.partialsPath.length>0) {
+            await hbs.registerPartials();
+        }
 
-    // Run the compiled templates
-    locals.body = template(locals, hbs.templateOptions);
-    this.body = layoutTemplate(locals, hbs.templateOptions);
-  };
+        // Load the template
+        if(hbs.disableCache||!hbs.cache[tpl]) {
+            rawTemplate=await read(tplPath);
+            hbs.cache[tpl]={
+                template: hbs.handlebars.compile(rawTemplate)
+            };
+
+            // Load layout if specified
+            if(typeof locals.layout!=='undefined'||rLayoutPattern.test(rawTemplate)) {
+                var layout=locals.layout;
+
+                if(typeof layout==='undefined') { layout=rLayoutPattern.exec(rawTemplate)[1]; }
+
+                if(layout!==false) {
+                    var rawLayout=await hbs.loadLayoutFile(layout);
+                    hbs.cache[tpl].layoutTemplate=hbs.handlebars.compile(rawLayout);
+                } else {
+                    hbs.cache[tpl].layoutTemplate=hbs.handlebars.compile('{{{body}}}');
+                }
+            }
+        }
+
+        template=hbs.cache[tpl].template;
+        layoutTemplate=hbs.cache[tpl].layoutTemplate;
+        if(!layoutTemplate) { layoutTemplate=await hbs.getLayoutTemplate(); }
+
+        // Add the current koa context to templateOptions.data to provide access
+        // to the request within helpers.
+        if(!hbs.templateOptions.data) {
+            hbs.templateOptions.data={};
+        }
+
+        hbs.templateOptions.data=merge(hbs.templateOptions.data, { koa: this });
+
+        // Run the compiled templates
+        locals.body=template(locals, hbs.templateOptions);
+        this.body=layoutTemplate(locals, hbs.templateOptions);
+    };
 };
 
 /**
  * Get layout path
  */
 
-Hbs.prototype.getLayoutPath = function (layout) {
-  if (this.layoutsPath) {
-    return path.join(this.layoutsPath, layout + this.extname);
-  }
+Hbs.prototype.getLayoutPath=function(layout) {
+    if(this.layoutsPath) {
+        return path.join(this.layoutsPath, layout+this.extname);
+    }
 
-  return path.join(this.viewPath[0], layout + this.extname);
+    return path.join(this.viewPath[0], layout+this.extname);
 };
 
 /**
  * Lazy load default layout in cache.
  */
-Hbs.prototype.getLayoutTemplate = async function () {
-  if (this.disableCache || !this.layoutTemplate) {
-    this.layoutTemplate = await this.cacheLayout();
-  }
-  return this.layoutTemplate;
+Hbs.prototype.getLayoutTemplate=async function() {
+    if(this.disableCache||!this.layoutTemplate) {
+        this.layoutTemplate=await this.cacheLayout();
+    }
+    return this.layoutTemplate;
 }
 
 /**
  * Get a default layout. If none is provided, make a noop
  */
 
-Hbs.prototype.cacheLayout = async function (layout) {
-  var hbs = this;
+Hbs.prototype.cacheLayout=async function(layout) {
+    var hbs=this;
 
-  // Create a default layout to always use
-  if (!layout && !hbs.defaultLayout) {
-    return hbs.handlebars.compile('{{{body}}}');
-  }
+    // Create a default layout to always use
+    if(!layout&&!hbs.defaultLayout) {
+        return hbs.handlebars.compile('{{{body}}}');
+    }
 
-  // Compile the default layout if one not passed
-  if (!layout) { layout = hbs.defaultLayout; }
+    // Compile the default layout if one not passed
+    if(!layout) { layout=hbs.defaultLayout; }
 
-  var layoutTemplate;
-  try {
-    var rawLayout = await hbs.loadLayoutFile(layout);
-    layoutTemplate = hbs.handlebars.compile(rawLayout);
-  } catch (err) {
-    console.error(err.stack);
-  }
+    var layoutTemplate;
+    try {
+        var rawLayout=await hbs.loadLayoutFile(layout);
+        layoutTemplate=hbs.handlebars.compile(rawLayout);
+    } catch(err) {
+        console.error(err.stack);
+    }
 
-  return layoutTemplate;
+    return layoutTemplate;
 };
 
 /**
  * Load a layout file
  */
 
-Hbs.prototype.loadLayoutFile = function (layout) {
-  var hbs = this;
-  var file = hbs.getLayoutPath(layout);
-  return read(file);
+Hbs.prototype.loadLayoutFile=function(layout) {
+    var hbs=this;
+    var file=hbs.getLayoutPath(layout);
+    return read(file);
 };
 
 /**
  * Register helper to internal handlebars instance
  */
 
-Hbs.prototype.registerHelper = function () {
-  this.handlebars.registerHelper.apply(this.handlebars, arguments);
+Hbs.prototype.registerHelper=function() {
+    this.handlebars.registerHelper.apply(this.handlebars, arguments);
 };
 
 /**
  * Register partial with internal handlebars instance
  */
 
-Hbs.prototype.registerPartial = function () {
-  this.handlebars.registerPartial.apply(this.handlebars, arguments);
+Hbs.prototype.registerPartial=function() {
+    this.handlebars.registerPartial.apply(this.handlebars, arguments);
 };
 
 /**
  * Register directory of partials
  */
 
-Hbs.prototype.registerPartials = async function () {
-  var self = this;
+Hbs.prototype.registerPartials=async function() {
+    var self=this;
 
-  if (!Array.isArray(this.partialsPath)) {
-    this.partialsPath = [this.partialsPath];
-  }
-
-  /* thunk creator for readdirp */
-  var readdir = function (root) {
-    return new Promise((resolve, reject) => {
-      glob('**/*' + self.extname, { cwd: root }, (err, files) => {
-        if (err)
-          return reject(err);
-        resolve(files);
-      });
-    });
-  };
-
-  /* Read in partials and register them */
-  try {
-    var resultList = await Promise.all(self.partialsPath.map(readdir));
-    var files = [];
-    var names = [];
-
-    if (!resultList.length) { return; }
-
-    // Generate list of files and template names
-    resultList.forEach(function (result, i) {
-      result.forEach(function (file) {
-        files.push(path.join(self.partialsPath[i], file));
-        names.push(file.slice(0, -1 * self.extname.length));
-      });
-    });
-
-    // Read all the partial from disk
-    var partials = await Promise.all(files.map(read));
-    for (var i = 0; i !== partials.length; i++) {
-      self.registerPartial(names[i], partials[i]);
+    if(!Array.isArray(this.partialsPath)) {
+        this.partialsPath=[this.partialsPath];
     }
 
-    self.partialsRegistered = true;
-  } catch (e) {
-    console.error('Error caught while registering partials');
-    console.error(e);
-  }
+    /* thunk creator for readdirp */
+    var readdir=function(root) {
+        return new Promise((resolve, reject) => {
+            glob('**/*'+self.extname, { cwd: root }, (err, files) => {
+                if(err)
+                    return reject(err);
+                resolve(files);
+            });
+        });
+    };
+
+    /* Read in partials and register them */
+    try {
+        var resultList=await Promise.all(self.partialsPath.map(readdir));
+        var files=[];
+        var names=[];
+
+        if(!resultList.length) { return; }
+
+        // Generate list of files and template names
+        resultList.forEach(function(result, i) {
+            result.forEach(function(file) {
+                files.push(path.join(self.partialsPath[i], file));
+                names.push(file.slice(0, -1*self.extname.length));
+            });
+        });
+
+        // Read all the partial from disk
+        var partials=await Promise.all(files.map(read));
+        for(var i=0; i!==partials.length; i++) {
+            self.registerPartial(names[i], partials[i]);
+        }
+
+        self.partialsRegistered=true;
+    } catch(e) {
+        console.error('Error caught while registering partials');
+        console.error(e);
+    }
 };
 
-Hbs.prototype.getTemplatePath = function getTemplatePath(tpl) {
-  var cache = (this.pathCache || (this.pathCache = {}));
-  if (cache[tpl])
-    return cache[tpl];
+Hbs.prototype.getTemplatePath=function getTemplatePath(tpl) {
+    var cache=(this.pathCache||(this.pathCache={}));
+    if(cache[tpl])
+        return cache[tpl];
 
-  for (var i = 0; i !== this.viewPath.length; i++) {
-    var viewPath = this.viewPath[i];
-    var tplPath = path.join(viewPath, tpl + this.extname);
-    try {
-      fs.statSync(tplPath);
-      if (!this.disableCache)
-        cache[tpl] = tplPath;
+    for(var i=0; i!==this.viewPath.length; i++) {
+        var viewPath=this.viewPath[i];
+        var tplPath=path.join(viewPath, tpl+this.extname);
+        try {
+            fs.statSync(tplPath);
+            if(!this.disableCache)
+                cache[tpl]=tplPath;
 
-      return tplPath;
-    } catch (e) {
-      continue;
+            return tplPath;
+        } catch(e) {
+            continue;
+        }
     }
-  }
 
-  return void 0;
+    return void 0;
 };
 
 /**
  * The contentFor helper delegates to here to populate block content
  */
 
-Hbs.prototype.content = function (name, options, context) {
-  // fetch block
-  var block = this.blocks[name] || (this.blocks[name] = []);
+Hbs.prototype.content=function(name, options, context) {
+    // fetch block
+    var block=this.blocks[name]||(this.blocks[name]=[]);
 
-  // render block and save for layout render
-  block.push(options.fn(context));
+    // render block and save for layout render
+    block.push(options.fn(context));
 };
 
 /**
  * block helper delegates to this function to retreive content
  */
 
-Hbs.prototype.block = function (name) {
-  // val = block.toString
-  var val = (this.blocks[name] || []).join('\n');
+Hbs.prototype.block=function(name) {
+    // val = block.toString
+    var val=(this.blocks[name]||[]).join('\n');
 
-  // clear the block
-  this.blocks[name] = [];
-  return val;
+    // clear the block
+    this.blocks[name]=[];
+    return val;
 };
