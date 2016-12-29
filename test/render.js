@@ -1,154 +1,169 @@
-var koa = require('koa');
-var hbs = require('..');
-var assert = require('assert');
-var request = require('supertest');
-var testApp = require('./app');
+'use strict';
 
-describe('without required options', function () {
-  it('should throw an error when viewPath is not set', function () {
-    assert.throws(function () { hbs.create().middleware({}); });
+const koa = require('koa');
+const hbs = require('..');
+const assert = require('assert');
+const request = require('supertest');
+const testApp = require('./app');
+
+describe('without required options', () => {
+  it('should throw an error when viewPath is not set', () => {
+    assert.throws(() => hbs.create().middleware({}));
   });
 });
 
-describe('rendering', function() {
-  var app;
+describe('rendering', () => {
+  let app,
+    server;
 
-  it('should render into the response body', function (done) {
+  before(() => {
     app = testApp.create({
       viewPath: __dirname + '/app/assets',
+      partialsPath: __dirname + '/app/assets/partials',
       locals: {
         title: 'hbs',
         article: 'locals'
       }
     });
 
-    request(app.listen())
+    server = app.listen();
+  });
+
+  after(() => server.close());
+
+  it('should render into the response body', (done) => {
+    request(server)
       .get('/')
       .expect(200)
-      .end(function (err, content) {
-        if(err) return done(err);
+      .end((err, content) => {
+        if (err) {
+          return done(err);
+        }
         assert.ok(/<title>test<\/title>/.test(content.text));
         assert.ok(/html/.test(content.text));
-        done();
+        done(err);
       });
   });
 
-  describe('with an empty template', function () {
-    it('should render a blank page', function (done) {
-      app = testApp.create({
-        viewPath: __dirname + '/app/assets'
+  it('should render a blank page', (done) => {
+    request(server)
+      .get('/empty')
+      .expect(200)
+      .end((err, page) => {
+        if (err) {
+          return done(err);
+        }
+        assert.deepEqual(page.text, '');
+        done(err);
       });
-
-      request(app.listen())
-        .get('/empty')
-        .expect(200)
-        .end(function (err, page) {
-          if(err) return done(err);
-          assert.deepEqual(page.text, '');
-          done();
-        });
-    });
   });
 
-  describe('with a bad template', function () {
-    it('should not render a missing template', function (done) {
-      app = testApp.create({
-        viewPath: __dirname + '/app/assets'
+  it('should not render a missing template', (done) => {
+    request(server)
+      .get('/missingTemplate')
+      .expect(500)
+      .end((err, page) => {
+        if (err) {
+          return done(err);
+        }
+        assert.deepEqual(page.text, 'Internal Server Error');
+        done(err);
       });
-
-      request(app.listen())
-        .get('/missingTemplate')
-        .expect(500)
-        .end(function (err, page) {
-          if(err) return done(err);
-          assert.deepEqual(page.text, 'Internal Server Error');
-          done();
-        });
-    });
   });
 
-  describe('with partials', function () {
-    it('should render into the response body', function (done) {
-      app = testApp.create({
-        viewPath: __dirname + '/app/assets',
-        partialsPath: __dirname + '/app/assets/partials'
-      });
-      request(app.listen())
+  describe('with partials', () => {
+    it('should render into the response body', (done) => {
+      request(server)
         .get('/partials')
         .expect(200)
-        .end(function (err, content) {
-          if(err) return done(err);
+        .end((err, content) => {
+          if (err) {
+            return done(err);
+          }
           assert.ok(/google\.com/.test(content.text));
-          done();
+          done(err);
         });
     });
 
-  it('should work also for nested partials', function (done) {
-    request(app.listen())
-      .get('/nestedPartials')
-      .expect(200)
-      .end(function (err, content) {
-        assert.ok(/NESTED/.test(content.text));
-        done();
-      });
+    it('should work also for nested partials', (done) => {
+      request(server)
+        .get('/nestedPartials')
+        .expect(200)
+        .end((err, content) => {
+          assert.ok(/NESTED/.test(content.text));
+          done(err);
+        });
     });
   });
 
-  describe('when using layouts', function () {
-    var app;
-    before(function () {
-      // Create app which specifies layouts
+  describe('when using layouts', () => {
+    let app,
+      server;
+
+    before(() => {
       app = testApp.create({
         viewPath: __dirname + '/app/assets',
         partialsPath: __dirname + '/app/assets/partials',
         layoutsPath: __dirname + '/app/assets/layouts',
         defaultLayout: 'default'
       });
+
+      server = app.listen();
     });
 
-    describe('with the default layout', function () {
-      it('should insert rendered content', function (done) {
-        request(app.listen())
+    after(() => server.close());
+
+    describe('with the default layout', () => {
+      it('should insert rendered content', (done) => {
+        request(server)
           .get('/layout')
           .expect(200)
-          .end(function (err, content) {
-            if(err) return done(err);
+          .end((err, content) => {
+            if (err) {
+              return done(err);
+            }
             assert.ok(/DEFAULT LAYOUT/.test(content.text));
             assert.ok(/DEFAULT CONTENT/.test(content.text));
             done();
           });
       });
 
-      it('should support alternative layouts', function (done) {
-        request(app.listen())
+      it('should support alternative layouts', (done) => {
+        request(server)
           .get('/altLayout')
           .expect(200)
-          .end(function (err, content) {
-            if(err) return done(err);
+          .end((err, content) => {
+            if (err) {
+              return done(err);
+            }
             assert.ok(/ALTERNATIVE LAYOUT/.test(content.text));
             assert.ok(/ALTERNATIVE CONTENT/.test(content.text));
             done();
           });
       });
 
-      it('should support overriding layouts from locals', function (done) {
-        request(app.listen())
+      it('should support overriding layouts from locals', (done) => {
+        request(server)
           .get('/overrideLayout')
           .expect(200)
-          .end(function (err, content) {
-            if(err) return done(err);
+          .end((err, content) => {
+            if (err) {
+              return done(err);
+            }
             assert.ok(/OVERRIDE LAYOUT/.test(content.text));
             assert.ok(/OVERRIDE CONTENT/.test(content.text));
             done();
           });
       });
 
-      it('should support specifying no layout from locals', function (done) {
-        request(app.listen())
+      it('should support specifying no layout from locals', (done) => {
+        request(server)
           .get('/noLayout')
           .expect(200)
-          .end(function (err, content) {
-            if(err) return done(err);
+          .end((err, content) => {
+            if (err) {
+              return done(err);
+            }
             assert.ok(!(/ALTERNATIVE LAYOUT/.test(content.text)));
             assert.ok(/NO LAYOUT CONTENT/.test(content.text));
             done();
@@ -156,35 +171,37 @@ describe('rendering', function() {
       });
     });
 
-    describe('with block content', function() {
-      it('should show default without content for', function (done) {
-        request(app.listen())
+    describe('with block content', () => {
+      it('should show default without content for', (done) => {
+        request(server)
           .get('/blockNoReplace')
           .expect(200)
-          .end(function (err, content) {
+          .end((err, content) => {
             assert.ok(/DEFAULT BLOCK CONTENT/.test(content.text));
             assert.ok(/NO BLOCK/.test(content.text));
-            done();
+            done(err);
           });
       });
 
-      it('should replace block content with contentFor', function (done) {
-        request(app.listen())
+      it('should replace block content with contentFor', (done) => {
+        request(server)
           .get('/block')
           .expect(200)
-          .end(function (err, content) {
+          .end((err, content) => {
             assert.ok(/CONTENT FOR SIDEBAR/.test(content.text));
             assert.ok(/CONTENT IN THE BODY/.test(content.text));
-            done();
+            done(err);
           });
       });
     });
 
   });
 
-  describe('when using locals', function () {
-    var app;
-    before(function () {
+  describe('when using locals', () => {
+    let app,
+      server;
+
+    before(() => {
       // Create app which specifies layouts
       app = testApp.create({
         viewPath: __dirname + '/app/assets',
@@ -194,104 +211,110 @@ describe('rendering', function() {
           title: 'Foo'
         }
       });
+
+      server = app.listen();
     });
 
-    it('should not overflow the call stack when recursive', function (done) {
-      request(app.listen())
+    after(() => server.close());
+
+    it('should not overflow the call stack when recursive', (done) => {
+      request(server)
         .get('/localsRecursive')
         .expect(200)
-        .end(function (err, content) {
-          if(err) {
-            return done(err);
-          }
-
-          done();
+        .end((err, content) => {
+          return done(err);
         });
     });
 
-    it('should render "Foo"', function (done) {
-      request(app.listen())
+    it('should render "Foo"', (done) => {
+      request(server)
         .get('/locals')
         .expect(200)
-        .end(function (err, content) {
+        .end((err, content) => {
           assert.ok(/Foo/.test(content.text));
-          done();
+          done(err);
         });
     });
 
-    it('should render "Bar"', function (done) {
-      request(app.listen())
+    it('should render "Bar"', (done) => {
+      request(server)
         .get('/localsOverride')
         .expect(200)
-        .end(function (err, content) {
+        .end((err, content) => {
           assert.ok(/Bar/.test(content.text));
-          done();
+          done(err);
         });
     });
 
-    it('should render "Bar" and "State"', function (done) {
-      request(app.listen())
+    it('should render "Bar" and "State"', (done) => {
+      request(server)
       .get('/localsState')
       .expect(200)
-      .end(function (err, content) {
+      .end((err, content) => {
         assert.ok(/Bar/.test(content.text));
         assert.ok(/State/.test(content.text));
-        done();
+        done(err);
       });
     });
   });
+
 });
 
-describe('var conflict', function () {
-  var app = koa();
-  app.use(hbs.middleware({
-    viewPath: __dirname + '/app/assets'
-  }));
-  app.use(function * () {
-    if (this.url === '/first') {
-      yield this.render('locals', {
-        title: 'hbs'
-      });
-      return;
-    }
-    if (this.url === '/second') {
-      yield this.render('locals', {
-        name: 'hbs'
-      });
-      return;
-    }
-  });
+describe('let conflict', () => {
+  const app = koa();
+  let server;
 
-  var server;
-  before(function () {
+  before(() => {
+    app.use(hbs.middleware({
+      viewPath: __dirname + '/app/assets'
+    }));
+
+    app.use(function * () {
+      if (this.url === '/first') {
+        yield this.render('locals', {
+          title: 'hbs'
+        });
+        return;
+      }
+      if (this.url === '/second') {
+        yield this.render('locals', {
+          name: 'hbs'
+        });
+        return;
+      }
+    });
+
     server = app.listen();
   });
 
-  it('should render title', function (done) {
+  after(() => server.close());
+
+  it('should render title', (done) => {
     request(server)
       .get('/first')
       .expect(200)
-      .end(function (err, content) {
+      .end((err, content) => {
         assert.ok(content.text.indexOf('<h1>hbs</h1>') !== -1);
-        done();
+        done(err);
       });
   });
 
-  it('should not have title', function (done) {
+  it('should not have title', (done) => {
     request(server)
       .get('/second')
       .expect(200)
-      .end(function (err, content) {
+      .end((err, content) => {
         assert.ok(content.text.indexOf('<h1></h1>') !== -1);
-        done();
+        done(err);
       });
   });
 });
 
-describe('list of view paths', function () {
-  var app;
-  var server;
-  before(function () {
+describe('list of view paths', () => {
+  let app,
+    server;
+
+  before(() => {
     // Create app which specifies layouts
     app = testApp.create({
       viewPath: [
@@ -306,14 +329,15 @@ describe('list of view paths', function () {
     server = app.listen();
   });
 
-  it('searches for views in all paths', function () {
+  after(() => server.close());
+
+  it('searches for views in all paths', (done) => {
     request(server)
       .get('/tplInOtherDir')
       .expect(200)
-      .end(function (err, content) {
-        console.log(content.text);
+      .end((err, content) => {
         assert.ok(content.text.indexOf('I\'m in another directory!') !== -1);
-        done();
+        done(err);
       });
   });
 });

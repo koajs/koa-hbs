@@ -1,7 +1,7 @@
-var koa = require('koa');
-var hbs = require('..');
+const koa = require('koa');
+const hbs = require('..');
 
-var app = koa();
+const app = koa();
 
 // koa-hbs is middleware. Use it before you want to render a view
 app.use(hbs.middleware({
@@ -12,6 +12,6 @@ app.use(hbs.middleware({
 // to attach your rendered html to the response body.
 app.use(function *() {
   yield this.render('main', {title: 'koa-hbs'});
-})
+});
 
 app.listen(3000);

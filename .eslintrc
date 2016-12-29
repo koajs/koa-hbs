@@ -1,0 +1,31 @@
+{
+  "env": {
+    "es6": true,
+    "mocha": true,
+    "node": true
+  },
+  "rules": {
+    "brace-style": [2, "stroustrup", { "allowSingleLine": false }],
+    "consistent-return": [0],
+    "comma-spacing": ["error", { "before": false, "after": true }],
+    "complexity": [0],
+    "indent": [2, 2, { "SwitchCase": 1, "VariableDeclarator": 1 }],
+    "keyword-spacing": ["error", { "after": true }],
+    "max-len": [1, 1000],
+    "no-bitwise": [0],
+    "no-extra-parens": [0],
+    "one-var": [2, {
+      "var": "always",
+      "let": "always",
+      "const": "never"
+    }],
+    "prefer-arrow-callback": ["error", { "allowNamedFunctions": true }],
+    "semi": [2, "always"],
+    "space-before-function-paren": ["error", "always"],
+    "space-infix-ops": ["error", { "int32Hint": false }],
+    "space-unary-ops": [0]
+  },
+  "parserOptions": {
+    "ecmaVersion": 8
+  }
+}

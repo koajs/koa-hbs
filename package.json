@@ -9,7 +9,7 @@
   },
   "homepage": "https://github.com/gilt/koa-hbs/",
   "scripts": {
-    "test": "make test"
+    "test": "gulp test"
   },
   "keywords": [
     "koa",
@@ -19,6 +19,12 @@
     "render"
   ],
   "author": "Joe Wilm <jdwilm@gmail.com>",
+  "maintainers": [
+    {
+      "name": "Andrew Powell",
+      "email": "andrew@shellscape.org"
+    }
+  ],
   "license": "MIT",
   "dependencies": {
     "glob": "^7.0.5",
@@ -26,12 +32,15 @@
   },
   "devDependencies": {
     "co": "^4.6.0",
+    "eslint": "^3.12.2",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^3.0.1",
+    "gulp-mocha": "^3.0.1",
     "koa": "^1.2.0",
     "koa-router": "^5.4.0",
-    "mocha": "^3.1.2",
     "supertest": "^2.0.1"
   },
   "engines": {
-    "node": ">= 4.0.0"
+    "node": ">= 4.7.0"
   }
 }

@@ -1,7 +1,12 @@
-var fs = require('fs');
-var path = require('path');
-var glob = require('glob');
-var util = require('util');
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const glob = require('glob');
+const util = require('util');
+
+/* Capture the layout name; thanks express-hbs */
+const rLayoutPattern = /{{!<\s+([A-Za-z0-9\._\-\/]+)\s*}}/;
 
 /**
  * Shallow copy two objects into a new object
@@ -15,15 +20,17 @@ var util = require('util');
  * @api private
  */
 
-var merge = function (obj1, obj2) {
-  var c = {};
-  var keys = Object.keys(obj2);
-  for(var i=0; i!==keys.length; i++) {
+function merge (obj1, obj2) {
+  var c = {},
+    keys = Object.keys(obj2),
+    i;
+
+  for (i = 0; i !== keys.length; i++) {
     c[keys[i]] = obj2[keys[i]];
   }
 
   keys = Object.keys(obj1);
-  for(i=0; i!==keys.length; i++) {
+  for (i = 0; i !== keys.length; i++) {
     if (!c.hasOwnProperty(keys[i])) {
       c[keys[i]] = obj1[keys[i]];
     }
@@ -32,17 +39,13 @@ var merge = function (obj1, obj2) {
   return c;
 };
 
-
-/* Capture the layout name; thanks express-hbs */
-var rLayoutPattern = /{{!<\s+([A-Za-z0-9\._\-\/]+)\s*}}/;
-
 /**
  * file reader returning a thunk
  * @param filename {String} Name of file to read
  */
 
-var read = function (filename) {
-  return function(done) {
+function read (filename) {
+  return function (done) {
     fs.readFile(filename, {encoding: 'utf8'}, done);
   };
 };
@@ -85,19 +88,19 @@ exports = module.exports = new Hbs();
  * expose method to create additional instances of `Hbs`
  */
 
-exports.create = function() {
+exports.create = function () {
   return new Hbs();
 };
-
 
 /**
  * Create new instance of `Hbs`
  *
  * @api public
  */
-
-function Hbs() {
-  if(!(this instanceof Hbs)) { return new Hbs(); }
+function Hbs () {
+  if (!(this instanceof Hbs)) {
+    return new Hbs();
+  }
 
   this.handlebars = require('handlebars').create();
 
@@ -115,7 +118,9 @@ Hbs.prototype.configure = function (options) {
 
   var self = this;
 
-  if(!options.viewPath) { throw new BadOptionsError('The option `viewPath` must be specified.'); }
+  if (!options.viewPath) {
+    throw new BadOptionsError('The option `viewPath` must be specified.');
+  }
 
   // Attach options
   options = options || {};
@@ -142,11 +147,12 @@ Hbs.prototype.configure = function (options) {
   this.blocks = {};
 
   // block helper
-  this.registerHelper(this.blockHelperName, function(name, options) {
+  this.registerHelper(this.blockHelperName, function (name, options) {
     // instead of returning self.block(name), render the default content if no
     // block is given
-    val = self.block(name);
-    if(val === '' && typeof options.fn === 'function') {
+    let val = self.block(name);
+
+    if (val === '' && typeof options.fn === 'function') {
       val = options.fn(this);
     }
 
@@ -154,7 +160,7 @@ Hbs.prototype.configure = function (options) {
   });
 
   // contentFor helper
-  this.registerHelper(this.contentHelperName, function(name, options) {
+  this.registerHelper(this.contentHelperName, function (name, options) {
     return self.content(name, options, this);
   });
 
@@ -167,10 +173,10 @@ Hbs.prototype.configure = function (options) {
  * @api public
  */
 
-Hbs.prototype.middleware = function(options) {
+Hbs.prototype.middleware = function (options) {
   this.configure(options);
 
-  var render = this.createRenderer();
+  let render = this.createRenderer();
 
   return function *(next) {
     this.render = render;
@@ -182,11 +188,11 @@ Hbs.prototype.middleware = function(options) {
  * Create a render generator to be attached to koa context
  */
 
-Hbs.prototype.createRenderer = function() {
-  var hbs = this;
+Hbs.prototype.createRenderer = function () {
+  let hbs = this;
 
   return function *(tpl, locals) {
-    var tplPath = hbs.getTemplatePath(tpl),
+    let tplPath = hbs.getTemplatePath(tpl),
       template, rawTemplate, layoutTemplate;
 
     if (!tplPath) {
@@ -203,27 +209,30 @@ Hbs.prototype.createRenderer = function() {
 
     // Initialization... move these actions into another function to remove
     // unnecessary checks
-    if(hbs.disableCache || !hbs.partialsRegistered && hbs.partialsPath !== '') {
+    if (hbs.disableCache || !hbs.partialsRegistered && hbs.partialsPath !== '') {
       yield hbs.registerPartials();
     }
 
     // Load the template
-    if(hbs.disableCache || !hbs.cache[tpl]) {
+    if (hbs.disableCache || !hbs.cache[tpl]) {
       rawTemplate = yield read(tplPath);
       hbs.cache[tpl] = {
         template: hbs.handlebars.compile(rawTemplate)
       };
 
       // Load layout if specified
-      if(typeof locals.layout !== 'undefined' || rLayoutPattern.test(rawTemplate)) {
-        var layout = locals.layout;
+      if (typeof locals.layout !== 'undefined' || rLayoutPattern.test(rawTemplate)) {
+        let layout = locals.layout;
 
-        if (typeof layout === 'undefined') { layout = rLayoutPattern.exec(rawTemplate)[1]; }
+        if (typeof layout === 'undefined') {
+          layout = rLayoutPattern.exec(rawTemplate)[1];
+        }
 
         if (layout !== false) {
-          var rawLayout = yield hbs.loadLayoutFile(layout);
+          let rawLayout = yield hbs.loadLayoutFile(layout);
           hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile(rawLayout);
-        } else {
+        }
+        else {
           hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile('{{{body}}}');
         }
       }
@@ -231,7 +240,10 @@ Hbs.prototype.createRenderer = function() {
 
     template = hbs.cache[tpl].template;
     layoutTemplate = hbs.cache[tpl].layoutTemplate;
-    if(!layoutTemplate) { layoutTemplate = yield hbs.getLayoutTemplate(); }
+
+    if (!layoutTemplate) {
+      layoutTemplate = yield hbs.getLayoutTemplate();
+    }
 
     // Add the current koa context to templateOptions.data to provide access
     // to the request within helpers.
@@ -251,8 +263,8 @@ Hbs.prototype.createRenderer = function() {
  * Get layout path
  */
 
-Hbs.prototype.getLayoutPath = function(layout) {
-  if(this.layoutsPath) {
+Hbs.prototype.getLayoutPath = function (layout) {
+  if (this.layoutsPath) {
     return path.join(this.layoutsPath, layout + this.extname);
   }
 
@@ -262,31 +274,39 @@ Hbs.prototype.getLayoutPath = function(layout) {
 /**
  * Lazy load default layout in cache.
  */
-Hbs.prototype.getLayoutTemplate = function*() {
-  if(this.disableCache || !this.layoutTemplate) { this.layoutTemplate = yield this.cacheLayout(); }
+Hbs.prototype.getLayoutTemplate = function* () {
+  if (this.disableCache || !this.layoutTemplate) {
+    this.layoutTemplate = yield this.cacheLayout();
+  }
+
   return this.layoutTemplate;
-}
+};
 
 /**
  * Get a default layout. If none is provided, make a noop
  */
 
-Hbs.prototype.cacheLayout = function(layout) {
-  var hbs = this;
+Hbs.prototype.cacheLayout = function (layout) {
+  let hbs = this;
+
   return function* () {
     // Create a default layout to always use
-    if(!layout && !hbs.defaultLayout) {
+    if (!layout && !hbs.defaultLayout) {
       return hbs.handlebars.compile('{{{body}}}');
     }
 
     // Compile the default layout if one not passed
-    if(!layout) { layout = hbs.defaultLayout; }
+    if (!layout) {
+      layout = hbs.defaultLayout;
+    }
 
-    var layoutTemplate;
+    let layoutTemplate;
+
     try {
-      var rawLayout = yield hbs.loadLayoutFile(layout);
+      let rawLayout = yield hbs.loadLayoutFile(layout);
       layoutTemplate = hbs.handlebars.compile(rawLayout);
-    } catch (err) {
+    }
+    catch (err) {
       console.error(err.stack);
     }
 
@@ -298,10 +318,10 @@ Hbs.prototype.cacheLayout = function(layout) {
  * Load a layout file
  */
 
-Hbs.prototype.loadLayoutFile = function(layout) {
-  var hbs = this;
-  return function(done) {
-    var file = hbs.getLayoutPath(layout);
+Hbs.prototype.loadLayoutFile = function (layout) {
+  let hbs = this;
+  return function (done) {
+    let file = hbs.getLayoutPath(layout);
     read(file)(done);
   };
 };
@@ -310,7 +330,7 @@ Hbs.prototype.loadLayoutFile = function(layout) {
  * Register helper to internal handlebars instance
  */
 
-Hbs.prototype.registerHelper = function() {
+Hbs.prototype.registerHelper = function () {
   this.handlebars.registerHelper.apply(this.handlebars, arguments);
 };
 
@@ -318,7 +338,7 @@ Hbs.prototype.registerHelper = function() {
  * Register partial with internal handlebars instance
  */
 
-Hbs.prototype.registerPartial = function() {
+Hbs.prototype.registerPartial = function () {
   this.handlebars.registerPartial.apply(this.handlebars, arguments);
 };
 
@@ -327,15 +347,15 @@ Hbs.prototype.registerPartial = function() {
  */
 
 Hbs.prototype.registerPartials = function () {
-  var self = this;
+  let self = this;
 
-  if(!Array.isArray(this.partialsPath)) {
+  if (!Array.isArray(this.partialsPath)) {
     this.partialsPath = [this.partialsPath];
   }
 
   /* thunk creator for readdirp */
-  var readdir = function(root) {
-    return function(done) {
+  var readdir = function (root) {
+    return function (done) {
       glob('**/*' + self.extname, {
         cwd: root,
       }, done);
@@ -343,30 +363,36 @@ Hbs.prototype.registerPartials = function () {
   };
 
   /* Read in partials and register them */
-  return function *() {
+  return function* () {
     try {
-      var resultList = yield self.partialsPath.map( readdir );
-      var files = [];
-      var names = [];
+      let resultList = yield self.partialsPath.map(readdir),
+        files = [],
+        names = [],
+        partials,
+        i;
 
-      if (!resultList.length) { return; }
+      if (!resultList.length) {
+        return;
+      }
 
       // Generate list of files and template names
-      resultList.forEach(function(result,i) {
-        result.forEach(function(file) {
+      resultList.forEach((result, i) => {
+        result.forEach((file) => {
           files.push(path.join(self.partialsPath[i], file));
-          names.push(file.slice(0,-1*self.extname.length));
+          names.push(file.slice(0, -1 * self.extname.length));
         });
       });
 
       // Read all the partial from disk
-      var partials = yield files.map(read);
-      for(var i=0; i!==partials.length; i++) {
+      partials = yield files.map(read);
+
+      for (i = 0; i !== partials.length; i++) {
         self.registerPartial(names[i], partials[i]);
       }
 
       self.partialsRegistered = true;
-    } catch(e) {
+    }
+    catch (e) {
       console.error('Error caught while registering partials');
       console.error(e);
     }
@@ -374,21 +400,25 @@ Hbs.prototype.registerPartials = function () {
   };
 };
 
-Hbs.prototype.getTemplatePath = function getTemplatePath(tpl) {
-  var cache = (this.pathCache || (this.pathCache = {}));
+Hbs.prototype.getTemplatePath = function (tpl) {
+  let cache = (this.pathCache || (this.pathCache = {})),
+    i;
+
   if (cache[tpl])
     return cache[tpl];
 
-  for (var i=0; i!==this.viewPath.length; i++) {
-    var viewPath = this.viewPath[i];
-    var tplPath = path.join(viewPath, tpl + this.extname);
+  for (i = 0; i !== this.viewPath.length; i++) {
+    let viewPath = this.viewPath[i],
+      tplPath = path.join(viewPath, tpl + this.extname);
+
     try {
       fs.statSync(tplPath);
       if (!this.disableCache)
         cache[tpl] = tplPath;
 
       return tplPath;
-    } catch (e) {
+    }
+    catch (e) {
       continue;
     }
   }
@@ -400,9 +430,9 @@ Hbs.prototype.getTemplatePath = function getTemplatePath(tpl) {
  * The contentFor helper delegates to here to populate block content
  */
 
-Hbs.prototype.content = function(name, options, context) {
+Hbs.prototype.content = function (name, options, context) {
   // fetch block
-  var block = this.blocks[name] || (this.blocks[name] = []);
+  let block = this.blocks[name] || (this.blocks[name] = []);
 
   // render block and save for layout render
   block.push(options.fn(context));
@@ -412,9 +442,9 @@ Hbs.prototype.content = function(name, options, context) {
  * block helper delegates to this function to retreive content
  */
 
-Hbs.prototype.block = function(name) {
+Hbs.prototype.block = function (name) {
   // val = block.toString
-  var val = (this.blocks[name] || []).join('\n');
+  let val = (this.blocks[name] || []).join('\n');
 
   // clear the block
   this.blocks[name] = [];
