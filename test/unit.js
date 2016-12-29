@@ -1,11 +1,13 @@
-var assert = require('assert');
-var path = require('path');
-var co = require('co');
+const assert = require('assert');
+const path = require('path');
+const co = require('co');
 
-describe('unit tests', function() {
-  describe('getLayoutPath', function() {
-    var hbs;
-    before(function() {
+describe('unit tests', () => {
+
+  describe('getLayoutPath', () => {
+    let hbs;
+
+    before(() => {
       hbs = require('..').create();
       hbs.middleware({
         viewPath: __dirname + '/app/assets',
@@ -14,15 +16,16 @@ describe('unit tests', function() {
       });
     });
 
-    it('should return the correct path', function() {
-      var layoutPath = path.join(__dirname, '/app/assets/layouts/default.hbs');
+    it('should return the correct path', () => {
+      let layoutPath = path.join(__dirname, '/app/assets/layouts/default.hbs');
       assert.equal(hbs.getLayoutPath('default'), layoutPath);
     });
   });
 
-  describe('registerPartials', function() {
-    var hbs;
-    before(function() {
+  describe('registerPartials', () => {
+    let hbs;
+
+    before(() => {
       hbs = require('..').create();
       hbs.middleware({
         viewPath: __dirname + '/app/assets'
