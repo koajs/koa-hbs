@@ -1,3 +1,5 @@
+'use strict';
+
 const koa = require('koa');
 const hbs = require('..');
 const assert = require('assert');
@@ -43,34 +45,30 @@ describe('rendering', () => {
       });
   });
 
-  describe('with an empty template', () => {
-    it('should render a blank page', (done) => {
-      request(server)
-        .get('/empty')
-        .expect(200)
-        .end((err, page) => {
-          if (err) {
-            return done(err);
-          }
-          assert.deepEqual(page.text, '');
-          done(err);
-        });
-    });
+  it('should render a blank page', (done) => {
+    request(server)
+      .get('/empty')
+      .expect(200)
+      .end((err, page) => {
+        if (err) {
+          return done(err);
+        }
+        assert.deepEqual(page.text, '');
+        done(err);
+      });
   });
 
-  describe('with a bad template', () => {
-    it('should not render a missing template', (done) => {
-      request(server)
-        .get('/missingTemplate')
-        .expect(500)
-        .end((err, page) => {
-          if (err) {
-            return done(err);
-          }
-          assert.deepEqual(page.text, 'Internal Server Error');
-          done(err);
-        });
-    });
+  it('should not render a missing template', (done) => {
+    request(server)
+      .get('/missingTemplate')
+      .expect(500)
+      .end((err, page) => {
+        if (err) {
+          return done(err);
+        }
+        assert.deepEqual(page.text, 'Internal Server Error');
+        done(err);
+      });
   });
 
   describe('with partials', () => {
@@ -97,7 +95,7 @@ describe('rendering', () => {
         });
     });
   });
-//
+
   describe('when using layouts', () => {
     let app,
       server;
@@ -198,7 +196,7 @@ describe('rendering', () => {
     });
 
   });
-//
+
   describe('when using locals', () => {
     let app,
       server;

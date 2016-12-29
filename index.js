@@ -1,3 +1,5 @@
+'use strict';
+
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
@@ -148,7 +150,8 @@ Hbs.prototype.configure = function (options) {
   this.registerHelper(this.blockHelperName, function (name, options) {
     // instead of returning self.block(name), render the default content if no
     // block is given
-    val = self.block(name);
+    let val = self.block(name);
+
     if (val === '' && typeof options.fn === 'function') {
       val = options.fn(this);
     }
