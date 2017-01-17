@@ -6,7 +6,17 @@ koa-hbs [![Build Status][travis-badge]][repo-url]
 > **_ATTENTION_**: This is the `@next` version of koa-hbs, specifically for use with
 Koa v2 or higher. This branch will not work with Koa v1.x.
 
+## Async / Await
+
+This branch assumes native `async/await` support. At present only Node v7 or
+higher can natively support the pattern. However, you must use a `--harmony-async-await`
+flag on the command line while running your app, or programmatically.  We
+recommend using [harmonica](https://www.npmjs.com/package/harmonica) to enable
+the `--harmony` flags programmatically. An example pattern for using `harmonica`
+can be found in this branch's [gulpfile.js](gulpfile.js).
+
 ## Usage
+
 koa-hbs is middleware. We stash an instance of koa-hbs for you in the library
 so you don't have to manage it separately. Configure the default instance by
 passing an [options](#options) hash to #middleware. To render a template then,
