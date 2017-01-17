@@ -227,8 +227,21 @@ exposed as local variables within your views.
 
 ## Koa2
 
-Until Koa2 support is included by default in the module, you can use a few
-supporting modules to achieve the same result. We've put together an example
+Koa2 is supported via the `@next` module version. It is considered experimental
+and **_requires Node v7 or higher_**. You can obtain this version by running:
+
+```bash
+npm install koa-hbs@next --save
+```
+
+For information on using this version, please read the branch's
+[README](https://github.com/gilt-labs/koa-hbs/tree/next). We recommend using
+[harmonica](https://www.npmjs.com/package/harmonica) to enable the `--harmony`
+flags, which allows for native `async/await`.
+
+
+If you'd rather not use an experimental version, or you need to use an older
+version of Node, you can reference this example
 repo that demonstrates how to use `koa-hbs` with Koa2:
 [koa-hbs-koa2-howto](https://github.com/shellscape/koa-hbs-koa2-howto)
 
