@@ -1,5 +1,7 @@
 'use strict';
 
+require('harmonica')();
+
 const eslint = require('gulp-eslint');
 const gulp = require('gulp');
 

@@ -1,6 +1,6 @@
 {
   "name": "koa-hbs",
-  "version": "0.9.0",
+  "version": "1.0.0-alpha.1",
   "description": "Handlebars Templates via Generators for Koa",
   "main": "index.js",
   "repository": {
@@ -25,6 +25,9 @@
       "email": "andrew@shellscape.org"
     }
   ],
+  "publishConfig": {
+    "tag": "next"
+  },
   "license": "MIT",
   "dependencies": {
     "glob": "^7.0.5",
@@ -36,11 +39,15 @@
     "gulp": "^3.9.1",
     "gulp-eslint": "^3.0.1",
     "gulp-mocha": "^3.0.1",
-    "koa": "^1.2.0",
-    "koa-router": "^5.4.0",
+    "harmonica": "^1.2.1",
+    "koa": "~2.0.0-alpha.7",
+    "koa-router": "^7.1.0",
     "supertest": "^2.0.1"
   },
+  "peerDependencies": {
+    "koa": "~2.0.0-alpha.7"
+  },
   "engines": {
-    "node": ">= 4.7.0"
+    "node": ">= 7.0.0"
   }
 }

@@ -1,11 +1,10 @@
-[koa]:https://github.com/koajs/koa/
-[handlebars]:http://handlebarsjs.com
-koa-hbs
+koa-hbs [![Build Status][travis-badge]][repo-url]
 =======
 
-[Handlebars][handlebars] templates for [Koa][koa]
+[Handlebars][handlebars] templates for [Koa@2][koa]
 
-[![Build Status][travis-badge]][repo-url]
+> **_ATTENTION_**: This is the `@next` version of koa-hbs, specifically for use with
+Koa v2 or higher. This branch will not work with Koa v1.x.
 
 ## Usage
 koa-hbs is middleware. We stash an instance of koa-hbs for you in the library
@@ -14,10 +13,10 @@ passing an [options](#options) hash to #middleware. To render a template then,
 just `yield this.render('templateName');`. Here's a basic app demonstrating all that:
 
 ```javascript
-var koa = require('koa');
-var hbs = require('koa-hbs');
+const koa = require('koa');
+const hbs = require('koa-hbs');
 
-var app = koa();
+const app = new koa();
 
 // koa-hbs is middleware. `use` it before you want to render a view
 app.use(hbs.middleware({
@@ -26,9 +25,9 @@ app.use(hbs.middleware({
 
 // Render is attached to the koa context. Call `this.render` in your middleware
 // to attach rendered html to the koa response body.
-app.use(function *() {
-  yield this.render('main', {title: 'koa-hbs'});
-})
+app.use(async (ctx) => {
+  await ctx.render('main', {title: 'koa-hbs'});
+});
 
 app.listen(3000);
 ```
@@ -89,13 +88,13 @@ using the default instance (helper stolen from official Handlebars
 [docs](http://handlebarsjs.com):
 
 ```javascript
-hbs = require('koa-hbs');
+const hbs = require('koa-hbs');
 
-hbs.registerHelper('link', function(text, url) {
+hbs.registerHelper('link', (text, url) => {
   text = hbs.Utils.escapeExpression(text);
   url  = hbs.Utils.escapeExpression(url);
 
-  var result = '<a href="' + url + '">' + text + '</a>';
+  let result = `<a href="${url}">${text}</a>`;
 
   return new hbs.SafeString(result);
 });
@@ -167,8 +166,8 @@ As of version 0.9.0, it's possible to override the layout used for rendering,
 using `locals`. For example:
 
 ```js
-router.get('/', function *() {
-  yield this.render('foo', {
+router.get('/', async (ctx) => {
+  await ctx.render('foo', {
     layout: 'bar'
   });
  });
@@ -209,10 +208,11 @@ could be impacted!*
 Application local variables (```[this.state](https://github.com/koajs/koa/blob/master/docs/api/context.md#ctxstate)```) are provided to all templates rendered within the application.
 
 ```javascript
-app.use(function *(next) {
-  this.state.title = 'My App';
-  this.state.email = 'me@myapp.com';
-  yield next;
+app.use(async (ctx, next) => {
+  ctx.state.title = 'My App';
+  ctx.state.email = 'me@myapp.com';
+
+  await next();
 });
 ```
 
@@ -224,15 +224,6 @@ exposed as local variables within your views.
 
 <p>Contact : {{email}}</p>
 ```
-
-## Koa2
-
-Until Koa2 support is included by default in the module, you can use a few
-supporting modules to achieve the same result. We've put together an example
-repo that demonstrates how to use `koa-hbs` with Koa2:
-[koa-hbs-koa2-howto](https://github.com/shellscape/koa-hbs-koa2-howto)
-
-Credit to [@chrisveness](https://github.com/chrisveness) for the initial investigation.
 
 ## Example
 You can run the included example via `npm install koa` and
@@ -262,3 +253,5 @@ Many thanks to [@jwilm](https://github.com/jwilm) for authoring this middleware.
 
 [travis-badge]: https://travis-ci.org/gilt/koa-hbs.png?branch=master
 [repo-url]: https://travis-ci.org/gilt/koa-hbs
+[koa]:https://github.com/koajs/koa/
+[handlebars]:http://handlebarsjs.com

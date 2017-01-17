@@ -261,7 +261,7 @@ describe('rendering', () => {
 });
 
 describe('let conflict', () => {
-  const app = koa();
+  const app = new koa();
   let server;
 
   before(() => {
@@ -269,15 +269,15 @@ describe('let conflict', () => {
       viewPath: __dirname + '/app/assets'
     }));
 
-    app.use(function * () {
-      if (this.url === '/first') {
-        yield this.render('locals', {
+    app.use(async (ctx) => {
+      if (ctx.url === '/first') {
+        await ctx.render('locals', {
           title: 'hbs'
         });
         return;
       }
-      if (this.url === '/second') {
-        yield this.render('locals', {
+      if (ctx.url === '/second') {
+        await ctx.render('locals', {
           name: 'hbs'
         });
         return;
