@@ -1,11 +1,16 @@
 [koa]:https://github.com/koajs/koa/
 [handlebars]:http://handlebarsjs.com
-koa-hbs
+koa-hbs [![Build Status](https://travis-ci.org/koajs/koa-hbs.svg?branch=master)](https://travis-ci.org/koajs/koa-hbs)
 =======
 
 [Handlebars][handlebars] templates for [Koa][koa]
 
-[![Build Status](https://travis-ci.org/koajs/koa-hbs.svg?branch=master)](https://travis-ci.org/koajs/koa-hbs)
+## &nbsp;
+<p align="center">
+  <b>:rocket: &nbsp; Are you ready to tackle ES6 and hone your JavaScript Skills?</b> &nbsp; :rocket:<br/>
+  Check out these outstanding <a href="https://es6.io/">ES6 courses</a> by <a href="https://github.com/wesbos">@wesbos</a>
+</p>
+---
 
 ## Usage
 koa-hbs is middleware. We stash an instance of koa-hbs for you in the library
