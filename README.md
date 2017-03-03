@@ -5,7 +5,7 @@ koa-hbs
 
 [Handlebars][handlebars] templates for [Koa][koa]
 
-[![Build Status][travis-badge]][repo-url]
+[![Build Status](https://travis-ci.org/koajs/koa-hbs.svg?branch=master)](https://travis-ci.org/koajs/koa-hbs)
 
 ## Usage
 koa-hbs is middleware. We stash an instance of koa-hbs for you in the library
