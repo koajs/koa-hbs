@@ -1,4 +1,4 @@
-koa-hbs [![Build Status][travis-badge]][repo-url]
+koa-hbs
 =======
 
 [Handlebars][handlebars] templates for [Koa@2][koa]
@@ -8,12 +8,12 @@ Koa v2 or higher. This branch will not work with Koa v1.x.
 
 ## Async / Await
 
-This branch assumes native `async/await` support. At present only Node v7 or
-higher can natively support the pattern. However, you must use a `--harmony-async-await`
-flag on the command line while running your app, or programmatically.  We
-recommend using [harmonica](https://www.npmjs.com/package/harmonica) to enable
-the `--harmony` flags programmatically. An example pattern for using `harmonica`
-can be found in this branch's [gulpfile.js](gulpfile.js).
+This branch assumes native `async/await` support. Node v7.6 and newer support `async/await`
+without the use of flags. For Node versions older than v7.6, the `--harmony-async-await`
+flag is required to active native support. We recommend using
+[harmonica](https://www.npmjs.com/package/harmonica) to enable the `--harmony`
+flags programmatically. An example pattern for using `harmonica` can be found in
+this branch within [gulpfile.js](gulpfile.js).
 
 ## Usage
 
