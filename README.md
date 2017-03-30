@@ -1,5 +1,6 @@
 [koa]:https://github.com/koajs/koa/
 [handlebars]:http://handlebarsjs.com
+
 koa-hbs [![Build Status](https://travis-ci.org/koajs/koa-hbs.svg?branch=master)](https://travis-ci.org/koajs/koa-hbs)
 =======
 
@@ -10,6 +11,7 @@ koa-hbs [![Build Status](https://travis-ci.org/koajs/koa-hbs.svg?branch=master)]
   <b>:rocket: &nbsp; Are you ready to tackle ES6 and hone your JavaScript Skills?</b> &nbsp; :rocket:<br/>
   Check out these outstanding <a href="https://es6.io/friend/POWELL">ES6 courses</a> by <a href="https://github.com/wesbos">@wesbos</a>
 </p>
+
 ---
 
 ## Usage
@@ -240,9 +242,10 @@ npm install koa-hbs@next --save
 ```
 
 For information on using this version, please read the branch's
-[README](https://github.com/gilt-labs/koa-hbs/tree/next). We recommend using
+[README](https://github.com/gilt-labs/koa-hbs/tree/next). If using a version of
+node older than v7.6, we recommend using
 [harmonica](https://www.npmjs.com/package/harmonica) to enable the `--harmony`
-flags, which allows for native `async/await`.
+flags, which activates native `async/await` support.
 
 
 If you'd rather not use an experimental version, or you need to use an older
