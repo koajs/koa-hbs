@@ -8,10 +8,10 @@ app.use(hbs.middleware({
   viewPath: __dirname + '/views'
 }));
 
-// Render is attached to the koa context. Call this.render in your middleware
+// Render is attached to the koa context. Call ctx.render in your middleware
 // to attach your rendered html to the response body.
-app.use(function *() {
-  yield this.render('main', {title: 'koa-hbs'});
+app.use(async (ctx) => {
+  await ctx.render('main', {title: 'koa-hbs'});
 });
 
 app.listen(3000);
