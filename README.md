@@ -41,7 +41,7 @@ app.listen(3000);
 ```
 
 After a template has been rendered, the template function is cached. `#render`
-accepts two arguements - the template to render, and an object containing local
+accepts two arguments - the template to render, and an object containing local
 variables to be inserted into the template. The result is assigned to Koa's
 `this.response.body`.
 
