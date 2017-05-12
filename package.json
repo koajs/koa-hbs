@@ -30,22 +30,22 @@
   },
   "license": "MIT",
   "dependencies": {
-    "glob": "^7.0.5",
-    "handlebars": "^4.0.5"
+    "glob": "^7.1.1",
+    "handlebars": "^4.0.8"
   },
   "devDependencies": {
     "co": "^4.6.0",
-    "eslint": "^3.12.2",
+    "eslint": "^3.19.0",
     "gulp": "^3.9.1",
     "gulp-eslint": "^3.0.1",
-    "gulp-mocha": "^3.0.1",
-    "harmonica": "^1.2.1",
-    "koa": "~2.0.0-alpha.7",
-    "koa-router": "^7.1.0",
-    "supertest": "^2.0.1"
+    "gulp-mocha": "^4.3.1",
+    "harmonica": "^1.2.2",
+    "koa": "^2.2.0",
+    "koa-router": "^7.1.1",
+    "supertest": "^3.0.0"
   },
   "peerDependencies": {
-    "koa": "~2.0.0-alpha.7"
+    "koa": "^2.0.0"
   },
   "engines": {
     "node": ">= 7.0.0"
