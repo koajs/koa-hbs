@@ -1,12 +1,10 @@
-'use strict';
-
-const fs = require('fs');
-const path = require('path');
-const glob = require('glob');
-const util = require('util');
+const fs = require('fs')
+const path = require('path')
+const glob = require('glob')
+const util = require('util')
 
 /* Capture the layout name; thanks express-hbs */
-const rLayoutPattern = /{{!<\s+([A-Za-z0-9\._\-\/]+)\s*}}/;
+const rLayoutPattern = /{{!<\s+([A-Za-z0-9._\-/]+)\s*}}/
 
 /**
  * Shallow copy two objects into a new object
@@ -21,34 +19,36 @@ const rLayoutPattern = /{{!<\s+([A-Za-z0-9\._\-\/]+)\s*}}/;
  */
 
 function merge (obj1, obj2) {
-  var c = {},
-    keys = Object.keys(obj2),
-    i;
+  const c = {}
+  let keys = Object.keys(obj2)
+  let i
 
   for (i = 0; i !== keys.length; i++) {
-    c[keys[i]] = obj2[keys[i]];
+    c[keys[i]] = obj2[keys[i]]
   }
 
-  keys = Object.keys(obj1);
+  keys = Object.keys(obj1)
   for (i = 0; i !== keys.length; i++) {
     if (!c.hasOwnProperty(keys[i])) {
-      c[keys[i]] = obj1[keys[i]];
+      c[keys[i]] = obj1[keys[i]]
     }
   }
 
-  return c;
+  return c
 };
 
 /**
  * file reader returning a thunk
  * @param filename {String} Name of file to read
  */
-
 function read (filename) {
-  return function (done) {
-    fs.readFile(filename, {encoding: 'utf8'}, done);
-  };
-};
+  return new Promise((resolve, reject) => {
+    fs.readFile(filename, { encoding: 'utf8' }, (err, data) => {
+      if (err) return reject(err)
+      resolve(data)
+    })
+  })
+}
 
 /**
  * @class MissingTemplateError
@@ -56,13 +56,13 @@ function read (filename) {
  * @param {Object} extra   The value of the template, relating to the error.
  */
 function MissingTemplateError (message, extra) {
-  Error.captureStackTrace(this, this.constructor);
-  this.name = this.constructor.name;
-  this.message = message;
-  this.extra = extra;
+  Error.captureStackTrace(this, this.constructor)
+  this.name = this.constructor.name
+  this.message = message
+  this.extra = extra
 };
 
-util.inherits(MissingTemplateError, Error);
+util.inherits(MissingTemplateError, Error)
 
 /**
  * @class BadOptionsError
@@ -70,27 +70,27 @@ util.inherits(MissingTemplateError, Error);
  * @param {Object} extra   Misc infomration.
  */
 function BadOptionsError (message, extra) {
-  Error.captureStackTrace(this, this.constructor);
-  this.name = this.constructor.name;
-  this.message = message;
-  this.extra = extra;
+  Error.captureStackTrace(this, this.constructor)
+  this.name = this.constructor.name
+  this.message = message
+  this.extra = extra
 };
 
-util.inherits(BadOptionsError, Error);
+util.inherits(BadOptionsError, Error)
 
 /**
  * expose default instance of `Hbs`
  */
 
-exports = module.exports = new Hbs();
+exports = module.exports = new Hbs()
 
 /**
  * expose method to create additional instances of `Hbs`
  */
 
 exports.create = function () {
-  return new Hbs();
-};
+  return new Hbs()
+}
 
 /**
  * Create new instance of `Hbs`
@@ -99,13 +99,13 @@ exports.create = function () {
  */
 function Hbs () {
   if (!(this instanceof Hbs)) {
-    return new Hbs();
+    return new Hbs()
   }
 
-  this.handlebars = require('handlebars').create();
+  this.handlebars = require('handlebars').create()
 
-  this.Utils = this.handlebars.Utils;
-  this.SafeString = this.handlebars.SafeString;
+  this.Utils = this.handlebars.Utils
+  this.SafeString = this.handlebars.SafeString
 }
 
 /**
@@ -115,57 +115,56 @@ function Hbs () {
  */
 
 Hbs.prototype.configure = function (options) {
-
-  var self = this;
+  var self = this
 
   if (!options.viewPath) {
-    throw new BadOptionsError('The option `viewPath` must be specified.');
+    throw new BadOptionsError('The option `viewPath` must be specified.')
   }
 
   // Attach options
-  options = options || {};
-  this.viewPath = options.viewPath;
-  this.handlebars = options.handlebars || this.handlebars;
-  this.templateOptions = options.templateOptions || {};
-  this.extname = options.extname || '.hbs';
-  this.partialsPath = options.partialsPath || [];
-  this.contentHelperName = options.contentHelperName || 'contentFor';
-  this.blockHelperName = options.blockHelperName || 'block';
-  this.defaultLayout = options.defaultLayout || '';
-  this.layoutsPath = options.layoutsPath || '';
-  this.locals = options.locals || {};
-  this.disableCache = options.disableCache || false;
-  this.partialsRegistered = false;
+  options = options || {}
+  this.viewPath = options.viewPath
+  this.handlebars = options.handlebars || this.handlebars
+  this.templateOptions = options.templateOptions || {}
+  this.extname = options.extname || '.hbs'
+  this.partialsPath = options.partialsPath || []
+  this.contentHelperName = options.contentHelperName || 'contentFor'
+  this.blockHelperName = options.blockHelperName || 'block'
+  this.defaultLayout = options.defaultLayout || ''
+  this.layoutsPath = options.layoutsPath || ''
+  this.locals = options.locals || {}
+  this.disableCache = options.disableCache || false
+  this.partialsRegistered = false
 
   if (!Array.isArray(this.viewPath)) {
-    this.viewPath = [this.viewPath];
+    this.viewPath = [this.viewPath]
   }
 
   // Cache templates and layouts
-  this.cache = {};
+  this.cache = {}
 
-  this.blocks = {};
+  this.blocks = {}
 
   // block helper
   this.registerHelper(this.blockHelperName, function (name, options) {
     // instead of returning self.block(name), render the default content if no
     // block is given
-    let val = self.block(name);
+    let val = self.block(name)
 
     if (val === '' && typeof options.fn === 'function') {
-      val = options.fn(this);
+      val = options.fn(this)
     }
 
-    return val;
-  });
+    return val
+  })
 
   // contentFor helper
   this.registerHelper(this.contentHelperName, function (name, options) {
-    return self.content(name, options, this);
-  });
+    return self.content(name, options, this)
+  })
 
-  return this;
-};
+  return this
+}
 
 /**
  * Middleware for koa
@@ -174,90 +173,89 @@ Hbs.prototype.configure = function (options) {
  */
 
 Hbs.prototype.middleware = function (options) {
-  this.configure(options);
+  this.configure(options)
 
-  let render = this.createRenderer();
+  let render = this.createRenderer()
 
-  return function *(next) {
-    this.render = render;
-    yield* next;
-  };
-};
+  return async function (ctx, next) {
+    ctx.render = render
+    await next()
+  }
+}
 
 /**
  * Create a render generator to be attached to koa context
  */
 
 Hbs.prototype.createRenderer = function () {
-  let hbs = this;
+  let hbs = this
 
-  return function *(tpl, locals) {
-    let tplPath = hbs.getTemplatePath(tpl),
-      template, rawTemplate, layoutTemplate;
+  return async function (tpl, locals) {
+    let tplPath = hbs.getTemplatePath(tpl)
+    let template, rawTemplate, layoutTemplate
 
     if (!tplPath) {
-      throw new MissingTemplateError('The template specified does not exist.', tplPath);
+      throw new MissingTemplateError('The template specified does not exist.', tplPath)
     }
 
     // allow absolute paths to be used
     if (path.isAbsolute(tpl)) {
-      tplPath = tpl + hbs.extname;
+      tplPath = tpl + hbs.extname
     }
 
-    locals = merge(this.state || {}, locals || {});
-    locals = merge(hbs.locals, locals);
+    locals = merge(this.state || {}, locals || {})
+    locals = merge(hbs.locals, locals)
 
     // Initialization... move these actions into another function to remove
     // unnecessary checks
-    if (hbs.disableCache || !hbs.partialsRegistered && hbs.partialsPath !== '') {
-      yield hbs.registerPartials();
+    if (hbs.disableCache || (!hbs.partialsRegistered && hbs.partialsPath !== '')) {
+      await hbs.registerPartials()
     }
 
     // Load the template
     if (hbs.disableCache || !hbs.cache[tpl]) {
-      rawTemplate = yield read(tplPath);
+      rawTemplate = await read(tplPath)
       hbs.cache[tpl] = {
         template: hbs.handlebars.compile(rawTemplate)
-      };
+      }
 
       // Load layout if specified
       if (typeof locals.layout !== 'undefined' || rLayoutPattern.test(rawTemplate)) {
-        let layout = locals.layout;
+        let layout = locals.layout
 
         if (typeof layout === 'undefined') {
-          layout = rLayoutPattern.exec(rawTemplate)[1];
+          layout = rLayoutPattern.exec(rawTemplate)[1]
         }
 
         if (layout !== false) {
-          let rawLayout = yield hbs.loadLayoutFile(layout);
-          hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile(rawLayout);
-        }
-        else {
-          hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile('{{{body}}}');
+          let rawLayout = await hbs.loadLayoutFile(layout)
+          hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile(rawLayout)
+        } else {
+          hbs.cache[tpl].layoutTemplate = hbs.handlebars.compile('{{{body}}}')
         }
       }
     }
 
-    template = hbs.cache[tpl].template;
-    layoutTemplate = hbs.cache[tpl].layoutTemplate;
+    template = hbs.cache[tpl].template
+    layoutTemplate = hbs.cache[tpl].layoutTemplate
 
     if (!layoutTemplate) {
-      layoutTemplate = yield hbs.getLayoutTemplate();
+      layoutTemplate = await hbs.getLayoutTemplate()
     }
 
     // Add the current koa context to templateOptions.data to provide access
     // to the request within helpers.
     if (!hbs.templateOptions.data) {
-      hbs.templateOptions.data = {};
+      hbs.templateOptions.data = {}
     }
 
-    hbs.templateOptions.data = merge(hbs.templateOptions.data, { koa: this });
+    hbs.templateOptions.data = merge(hbs.templateOptions.data, { koa: this })
 
     // Run the compiled templates
-    locals.body = template(locals, hbs.templateOptions);
-    this.body = layoutTemplate(locals, hbs.templateOptions);
-  };
-};
+    locals.body = template(locals, hbs.templateOptions)
+    this.body = await layoutTemplate(locals, hbs.templateOptions)
+  }
+}
 
 /**
  * Get layout path
@@ -265,166 +263,160 @@ Hbs.prototype.createRenderer = function () {
 
 Hbs.prototype.getLayoutPath = function (layout) {
   if (this.layoutsPath) {
-    return path.join(this.layoutsPath, layout + this.extname);
+    return path.join(this.layoutsPath, layout + this.extname)
   }
 
-  return path.join(this.viewPath[0], layout + this.extname);
-};
+  return path.join(this.viewPath[0], layout + this.extname)
+}
 
 /**
  * Lazy load default layout in cache.
  */
-Hbs.prototype.getLayoutTemplate = function* () {
+Hbs.prototype.getLayoutTemplate = async function () {
   if (this.disableCache || !this.layoutTemplate) {
-    this.layoutTemplate = yield this.cacheLayout();
+    this.layoutTemplate = await this.cacheLayout()()
   }
-
-  return this.layoutTemplate;
-};
+  return this.layoutTemplate
+}
 
 /**
  * Get a default layout. If none is provided, make a noop
  */
 
 Hbs.prototype.cacheLayout = function (layout) {
-  let hbs = this;
+  let hbs = this
 
-  return function* () {
+  return async function () {
     // Create a default layout to always use
     if (!layout && !hbs.defaultLayout) {
-      return hbs.handlebars.compile('{{{body}}}');
+      return hbs.handlebars.compile('{{{body}}}')
     }
 
     // Compile the default layout if one not passed
     if (!layout) {
-      layout = hbs.defaultLayout;
+      layout = hbs.defaultLayout
     }
 
-    let layoutTemplate;
-
+    let layoutTemplate
     try {
-      let rawLayout = yield hbs.loadLayoutFile(layout);
-      layoutTemplate = hbs.handlebars.compile(rawLayout);
-    }
-    catch (err) {
-      console.error(err.stack);
+      let rawLayout = await hbs.loadLayoutFile(layout)
+      layoutTemplate = hbs.handlebars.compile(rawLayout)
+    } catch (err) {
+      console.error(err.stack)
     }
 
-    return layoutTemplate;
-  };
-};
+    return layoutTemplate
+  }
+}
 
 /**
  * Load a layout file
  */
-
 Hbs.prototype.loadLayoutFile = function (layout) {
-  let hbs = this;
-  return function (done) {
-    let file = hbs.getLayoutPath(layout);
-    read(file)(done);
-  };
-};
+  let hbs = this
+  return async function () {
+    const file = hbs.getLayoutPath(layout)
+    const data = await read(file)
+    return data
+  }
+}
 
 /**
  * Register helper to internal handlebars instance
  */
 
 Hbs.prototype.registerHelper = function () {
-  this.handlebars.registerHelper.apply(this.handlebars, arguments);
-};
+  this.handlebars.registerHelper.apply(this.handlebars, arguments)
+}
 
 /**
  * Register partial with internal handlebars instance
  */
 
 Hbs.prototype.registerPartial = function () {
-  this.handlebars.registerPartial.apply(this.handlebars, arguments);
-};
+  this.handlebars.registerPartial.apply(this.handlebars, arguments)
+}
 
 /**
  * Register directory of partials
  */
 
 Hbs.prototype.registerPartials = function () {
-  let self = this;
+  let self = this
 
   if (!Array.isArray(this.partialsPath)) {
-    this.partialsPath = [this.partialsPath];
+    this.partialsPath = [this.partialsPath]
   }
 
-  /* thunk creator for readdirp */
+  /* async creator for readdirp */
   var readdir = function (root) {
-    return function (done) {
-      glob('**/*' + self.extname, {
-        cwd: root,
-      }, done);
-    };
-  };
+    return async function () {
+      return new Promise((resolve, reject) => {
+        glob('**/*' + self.extname, { cwd: root }, (err, matches) => {
+          if (err) return reject(err)
+          resolve(matches)
+        })
+      })
+    }
+  }
 
   /* Read in partials and register them */
-  return function* () {
+  return async function () {
     try {
-      let resultList = yield self.partialsPath.map(readdir),
-        files = [],
-        names = [],
-        partials,
-        i;
+      const resultList = await self.partialsPath.map(readdir)
+      const files = []
+      const names = []
+      let partials
+      let i
 
       if (!resultList.length) {
-        return;
+        return
       }
 
       // Generate list of files and template names
       resultList.forEach((result, i) => {
         result.forEach((file) => {
-          files.push(path.join(self.partialsPath[i], file));
-          names.push(file.slice(0, -1 * self.extname.length));
-        });
-      });
+          files.push(path.join(self.partialsPath[i], file))
+          names.push(file.slice(0, -1 * self.extname.length))
+        })
+      })
 
       // Read all the partial from disk
-      partials = yield files.map(read);
+      partials = await files.map(read)
 
       for (i = 0; i !== partials.length; i++) {
-        self.registerPartial(names[i], partials[i]);
+        self.registerPartial(names[i], partials[i])
       }
 
-      self.partialsRegistered = true;
+      self.partialsRegistered = true
+    } catch (e) {
+      console.error('Error caught while registering partials')
+      console.error(e)
     }
-    catch (e) {
-      console.error('Error caught while registering partials');
-      console.error(e);
-    }
-
-  };
-};
+  }
+}
 
 Hbs.prototype.getTemplatePath = function (tpl) {
-  let cache = (this.pathCache || (this.pathCache = {})),
-    i;
+  const cache = (this.pathCache || (this.pathCache = {}))
+  let i
 
-  if (cache[tpl])
-    return cache[tpl];
+  if (cache[tpl]) return cache[tpl]
 
   for (i = 0; i !== this.viewPath.length; i++) {
-    let viewPath = this.viewPath[i],
-      tplPath = path.join(viewPath, tpl + this.extname);
-
+    const viewPath = this.viewPath[i]
+    const tplPath = path.join(viewPath, tpl + this.extname)
     try {
-      fs.statSync(tplPath);
-      if (!this.disableCache)
-        cache[tpl] = tplPath;
+      fs.statSync(tplPath)
+      if (!this.disableCache) cache[tpl] = tplPath
 
-      return tplPath;
-    }
-    catch (e) {
-      continue;
+      return tplPath
+    } catch (e) {
+      continue
     }
   }
 
-  return void 0;
-};
+  return void 0
+}
 
 /**
  * The contentFor helper delegates to here to populate block content
@@ -432,11 +424,11 @@ Hbs.prototype.getTemplatePath = function (tpl) {
 
 Hbs.prototype.content = function (name, options, context) {
   // fetch block
-  let block = this.blocks[name] || (this.blocks[name] = []);
+  let block = this.blocks[name] || (this.blocks[name] = [])
 
   // render block and save for layout render
-  block.push(options.fn(context));
-};
+  block.push(options.fn(context))
+}
 
 /**
  * block helper delegates to this function to retreive content
@@ -444,9 +436,9 @@ Hbs.prototype.content = function (name, options, context) {
 
 Hbs.prototype.block = function (name) {
   // val = block.toString
-  let val = (this.blocks[name] || []).join('\n');
+  let val = (this.blocks[name] || []).join('\n')
 
   // clear the block
-  this.blocks[name] = [];
-  return val;
-};
+  this.blocks[name] = []
+  return val
+}
