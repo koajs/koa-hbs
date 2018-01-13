@@ -1,7 +1,7 @@
 {
   "name": "koa-hbs",
   "version": "1.0.0",
-  "description": "Handlebars Templates via Generators for Koa",
+  "description": "Handlebars Templates via Async/Await for Koa",
   "main": "index.js",
   "repository": {
     "type": "git",
