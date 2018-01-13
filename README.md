@@ -10,7 +10,7 @@ Koa v2 or higher. This branch will not work with Koa v1.x.
 
 This branch assumes native `async/await` support. Node v7.6 and newer support `async/await`
 without the use of flags. For Node versions between v7.0 and v7.6, the `--harmony-async-await`
-flag is required to active native support. We recommend using
+flag is required to active native support. It's best to update the Node version used to v7.6 or newer as that's the most stable setup that doesn't require using any experimental flags. If that's not possible we recommend using
 [harmonica](https://www.npmjs.com/package/harmonica) to enable the `--harmony`
 flags programmatically. An example pattern for using `harmonica` can be found in
 this branch within [gulpfile.js](gulpfile.js).
