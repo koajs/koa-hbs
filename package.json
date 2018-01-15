@@ -9,7 +9,8 @@
   },
   "homepage": "https://github.com/gilt/koa-hbs/",
   "scripts": {
-    "test": "gulp test"
+    "lint": "eslint . --ext .js --fix",
+    "test": "mocha"
   },
   "keywords": [
     "koa",
@@ -36,12 +37,10 @@
   "devDependencies": {
     "co": "^4.6.0",
     "eslint": "^3.19.0",
-    "gulp": "^3.9.1",
-    "gulp-eslint": "^3.0.1",
-    "gulp-mocha": "^4.3.1",
     "harmonica": "^1.2.2",
     "koa": "^2.2.0",
     "koa-router": "^7.2.0",
+    "mocha": "^4.1.0",
     "supertest": "^3.0.0"
   },
   "peerDependencies": {

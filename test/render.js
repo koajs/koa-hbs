@@ -7,7 +7,7 @@ const request = require('supertest');
 const testApp = require('./app');
 
 describe('without required options', () => {
-  it('should throw an error when viewPath is not set', () => {
+  it('should throw an error when viewsPath is not set', () => {
     assert.throws(() => hbs.create().middleware({}));
   });
 });
@@ -18,7 +18,7 @@ describe('rendering', () => {
 
   before(() => {
     app = testApp.create({
-      viewPath: __dirname + '/app/assets',
+      viewsPath: __dirname + '/app/assets',
       partialsPath: __dirname + '/app/assets/partials',
       locals: {
         title: 'hbs',
@@ -102,7 +102,7 @@ describe('rendering', () => {
 
     before(() => {
       app = testApp.create({
-        viewPath: __dirname + '/app/assets',
+        viewsPath: __dirname + '/app/assets',
         partialsPath: __dirname + '/app/assets/partials',
         layoutsPath: __dirname + '/app/assets/layouts',
         defaultLayout: 'default'
@@ -204,7 +204,7 @@ describe('rendering', () => {
     before(() => {
       // Create app which specifies layouts
       app = testApp.create({
-        viewPath: __dirname + '/app/assets',
+        viewsPath: __dirname + '/app/assets',
         partialsPath: __dirname + '/app/assets/partials',
         layoutsPath: __dirname + '/app/assets/layouts',
         locals: {
@@ -266,7 +266,7 @@ describe('let conflict', () => {
 
   before(() => {
     app.use(hbs.middleware({
-      viewPath: __dirname + '/app/assets'
+      viewsPath: __dirname + '/app/assets'
     }));
 
     app.use(async (ctx) => {
@@ -317,7 +317,7 @@ describe('list of view paths', () => {
   before(() => {
     // Create app which specifies layouts
     app = testApp.create({
-      viewPath: [
+      viewsPath: [
         __dirname + '/app/assets',
         __dirname + '/app/otherViews',
         __dirname + '/app/pathThatDoesNotExist'
