@@ -12,7 +12,7 @@ describe('unit tests', () => {
     before(() => {
       hbs = require('..').create();
       hbs.middleware({
-        viewPath: __dirname + '/app/assets',
+        viewsPath: __dirname + '/app/assets',
         layoutsPath: __dirname + '/app/assets/layouts',
         partialsPath: __dirname + '/app/assets/partials'
       });
@@ -30,7 +30,7 @@ describe('unit tests', () => {
     before(() => {
       hbs = require('..').create();
       hbs.middleware({
-        viewPath: __dirname + '/app/assets'
+        viewsPath: __dirname + '/app/assets'
       });
     });
   });
