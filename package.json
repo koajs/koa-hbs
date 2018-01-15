@@ -2,15 +2,17 @@
   "name": "koa-hbs",
   "version": "1.0.0",
   "description": "Handlebars Templates via Async/Await for Koa",
-  "main": "index.js",
+  "main": "lib/hbs.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gilt/koa-hbs.git"
+    "url": "https://github.com/koajs/koa-hbs.git"
   },
-  "homepage": "https://github.com/gilt/koa-hbs/",
+  "homepage": "https://github.com/koajs/koa-hbs/",
   "scripts": {
+    "build": "babel src -d lib",
     "lint": "eslint . --ext .js --fix",
-    "test": "mocha"
+    "prepare": "npm run build",
+    "test": "mocha --require babel-register"
   },
   "keywords": [
     "koa",
@@ -35,7 +37,10 @@
     "handlebars": "^4.0.10"
   },
   "devDependencies": {
-    "co": "^4.6.0",
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.2.1",
+    "babel-preset-env": "^1.6.1",
+    "babel-register": "^6.26.0",
     "eslint": "^3.19.0",
     "harmonica": "^1.2.2",
     "koa": "^2.2.0",
@@ -48,5 +53,8 @@
   },
   "engines": {
     "node": ">= 7.0.0"
-  }
+  },
+  "files": [
+    "lib"
+  ]
 }

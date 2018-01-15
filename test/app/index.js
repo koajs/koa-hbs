@@ -1,10 +1,12 @@
 'use strict';
 
-const hbs = require('../../index');
-const koa = require('koa');
-const router = require('koa-router')();
+import hbs from '../../lib/hbs';
+import koa from 'koa';
+import Router from 'koa-router';
 
-function create (opts) {
+const router = Router();
+
+export function create (opts) {
   const app = new koa();
   const _hbs = hbs.create();
 
@@ -107,5 +109,3 @@ function create (opts) {
 
   return app;
 };
-
-exports.create = create;

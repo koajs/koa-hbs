@@ -1,9 +1,9 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const glob = require('glob');
-const util = require('util');
+import fs from 'fs';
+import path from 'path';
+import glob from 'glob';
+import util from 'util';
 
 /* Capture the layout name; thanks express-hbs */
 const rLayoutPattern = /{{!<\s+([A-Za-z0-9\._\-\/]+)\s*}}/;

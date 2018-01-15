@@ -1,5 +1,5 @@
 const koa = require('koa');
-const hbs = require('..');
+const hbs = require('../lib/hbs');
 
 const app = koa();
 

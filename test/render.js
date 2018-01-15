@@ -1,10 +1,10 @@
 'use strict';
 
-const koa = require('koa');
-const hbs = require('..');
-const assert = require('assert');
-const request = require('supertest');
-const testApp = require('./app');
+import koa from 'koa';
+import hbs from '../lib/hbs';
+import assert from 'assert';
+import request from 'supertest';
+import { create } from './app';
 
 describe('without required options', () => {
   it('should throw an error when viewsPath is not set', () => {
@@ -17,7 +17,7 @@ describe('rendering', () => {
     server;
 
   before(() => {
-    app = testApp.create({
+    app = create({
       viewsPath: __dirname + '/app/assets',
       partialsPath: __dirname + '/app/assets/partials',
       locals: {
@@ -101,7 +101,7 @@ describe('rendering', () => {
       server;
 
     before(() => {
-      app = testApp.create({
+      app = create({
         viewsPath: __dirname + '/app/assets',
         partialsPath: __dirname + '/app/assets/partials',
         layoutsPath: __dirname + '/app/assets/layouts',
@@ -203,7 +203,7 @@ describe('rendering', () => {
 
     before(() => {
       // Create app which specifies layouts
-      app = testApp.create({
+      app = create({
         viewsPath: __dirname + '/app/assets',
         partialsPath: __dirname + '/app/assets/partials',
         layoutsPath: __dirname + '/app/assets/layouts',
@@ -221,7 +221,7 @@ describe('rendering', () => {
       request(server)
         .get('/localsRecursive')
         .expect(200)
-        .end((err, content) => {
+        .end((err) => {
           return done(err);
         });
     });
@@ -316,7 +316,7 @@ describe('list of view paths', () => {
 
   before(() => {
     // Create app which specifies layouts
-    app = testApp.create({
+    app = create({
       viewsPath: [
         __dirname + '/app/assets',
         __dirname + '/app/otherViews',
