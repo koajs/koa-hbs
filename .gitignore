@@ -1,3 +1,4 @@
+.vscode
 lib-cov
 *.seed
 *.log
@@ -13,3 +14,4 @@ results
 
 npm-debug.log
 node_modules
+lib

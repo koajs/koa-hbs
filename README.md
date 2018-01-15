@@ -30,7 +30,7 @@ const app = new koa();
 
 // koa-hbs is middleware. `use` it before you want to render a view
 app.use(hbs.middleware({
-  viewPath: __dirname + '/views'
+  viewsPath: __dirname + '/views'
 }));
 
 // Render is attached to the koa context. Call `this.render` in your middleware
@@ -51,7 +51,7 @@ variables to be inserted into the template. The result is assigned to Koa's
 The plan for koa-hbs is to offer identical functionality as express-hbs
 (eventaully). These options are supported _now_.
 
-#### `viewPath` _required_
+#### `viewsPath` _required_
 Type: `Array|String`  
 Full path from which to load templates
 
@@ -136,7 +136,7 @@ middleware via
 
 ```
 app.use(hbs.middleware({
-  viewPath: __dirname + '/views',
+  viewsPath: __dirname + '/views',
   partialsPath: __dirname + '/views/partials'
 }));
 ```
@@ -164,8 +164,8 @@ the following.
 
 In addition to, or alternatively, you may specify a layout to render a template
 into. Simply specify `{{!< layoutName }}` somewhere in your template. koa-hbs
-will load your layout from `layoutsPath` if defined, or from `viewPath`
-otherwise. If `viewPath` is set to an Array of paths, **_the first path in the
+will load your layout from `layoutsPath` if defined, or from `viewsPath`
+otherwise. If `viewsPath` is set to an Array of paths, **_the first path in the
 array will be assumed to contain the layout named._**
 
 At this time, only a single content block (`{{{body}}}`) is supported.

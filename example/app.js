@@ -1,11 +1,11 @@
 const koa = require('koa');
-const hbs = require('..');
+const hbs = require('../lib/hbs');
 
 const app = koa();
 
 // koa-hbs is middleware. Use it before you want to render a view
 app.use(hbs.middleware({
-  viewPath: __dirname + '/views'
+  viewsPath: __dirname + '/views'
 }));
 
 // Render is attached to the koa context. Call ctx.render in your middleware

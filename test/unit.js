@@ -1,18 +1,18 @@
 'use strict';
 
-const assert = require('assert');
-const path = require('path');
-const co = require('co');
+import assert from 'assert';
+import path from 'path';
+import hbs from '../lib/hbs';
 
 describe('unit tests', () => {
 
   describe('getLayoutPath', () => {
-    let hbs;
+    let _hbs;
 
     before(() => {
-      hbs = require('..').create();
-      hbs.middleware({
-        viewPath: __dirname + '/app/assets',
+      _hbs = hbs.create();
+      _hbs.middleware({
+        viewsPath: __dirname + '/app/assets',
         layoutsPath: __dirname + '/app/assets/layouts',
         partialsPath: __dirname + '/app/assets/partials'
       });
@@ -20,17 +20,17 @@ describe('unit tests', () => {
 
     it('should return the correct path', () => {
       let layoutPath = path.join(__dirname, '/app/assets/layouts/default.hbs');
-      assert.equal(hbs.getLayoutPath('default'), layoutPath);
+      assert.equal(_hbs.getLayoutPath('default'), layoutPath);
     });
   });
 
   describe('registerPartials', () => {
-    let hbs;
+    let _hbs;
 
     before(() => {
-      hbs = require('..').create();
-      hbs.middleware({
-        viewPath: __dirname + '/app/assets'
+      _hbs = hbs.create();
+      _hbs.middleware({
+        viewsPath: __dirname + '/app/assets'
       });
     });
   });

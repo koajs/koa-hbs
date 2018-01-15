@@ -1,9 +1,9 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const glob = require('glob');
-const util = require('util');
+import fs from 'fs';
+import path from 'path';
+import glob from 'glob';
+import util from 'util';
 
 /* Capture the layout name; thanks express-hbs */
 const rLayoutPattern = /{{!<\s+([A-Za-z0-9\._\-\/]+)\s*}}/;
@@ -125,13 +125,13 @@ Hbs.prototype.configure = function (options) {
 
   var self = this;
 
-  if (!options.viewPath) {
-    throw new BadOptionsError('The option `viewPath` must be specified.');
+  if (!options.viewsPath) {
+    throw new BadOptionsError('The option `viewsPath` must be specified.');
   }
 
   // Attach options
   options = options || {};
-  this.viewPath = options.viewPath;
+  this.viewsPath = options.viewsPath;
   this.handlebars = options.handlebars || this.handlebars;
   this.templateOptions = options.templateOptions || {};
   this.extname = options.extname || '.hbs';
@@ -144,8 +144,8 @@ Hbs.prototype.configure = function (options) {
   this.disableCache = options.disableCache || false;
   this.partialsRegistered = false;
 
-  if (!Array.isArray(this.viewPath)) {
-    this.viewPath = [this.viewPath];
+  if (!Array.isArray(this.viewsPath)) {
+    this.viewsPath = [this.viewsPath];
   }
 
   // Cache templates and layouts
@@ -275,7 +275,7 @@ Hbs.prototype.getLayoutPath = function (layout) {
     return path.join(this.layoutsPath, layout + this.extname);
   }
 
-  return path.join(this.viewPath[0], layout + this.extname);
+  return path.join(this.viewsPath[0], layout + this.extname);
 };
 
 /**
@@ -408,9 +408,9 @@ Hbs.prototype.getTemplatePath = function (tpl) {
   if (cache[tpl])
     return cache[tpl];
 
-  for (i = 0; i !== this.viewPath.length; i++) {
-    let viewPath = this.viewPath[i],
-      tplPath = path.join(viewPath, tpl + this.extname);
+  for (i = 0; i !== this.viewsPath.length; i++) {
+    let viewsPath = this.viewsPath[i],
+      tplPath = path.join(viewsPath, tpl + this.extname);
 
     try {
       fs.statSync(tplPath);
