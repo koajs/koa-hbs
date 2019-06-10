@@ -378,8 +378,11 @@ Hbs.prototype.registerPartials = function () {
       // Generate list of files and template names
       resultList.forEach((result, i) => {
         result.forEach((file) => {
-          files.push(path.join(self.partialsPath[i], file));
-          names.push(file.slice(0, -1 * self.extname.length));
+          let name = file.slice(0, -1 * self.extname.length);
+          if (names.indexOf(name) === -1) {
+            files.push(path.join(self.partialsPath[i], file));
+            names.push(name);
+          }
         });
       });
 
