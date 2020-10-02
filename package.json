@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "co": "^4.6.0",
-    "eslint": "^3.12.2",
+    "eslint": "^7.10.0",
     "gulp": "^3.9.1",
     "gulp-eslint": "^3.0.1",
     "gulp-mocha": "^3.0.1",
